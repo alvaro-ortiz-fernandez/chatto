@@ -1,5 +1,6 @@
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/models/user-model.dart';
+import 'package:chatto/widgets/chat/chat-message.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -13,99 +14,107 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
 
-  _buildMessage(Message message, bool isMe) {
-    return Container(
-      margin: isMe
-        ? EdgeInsets.only(top: 8.0, bottom: 8.0, left: 80.0)
-        : EdgeInsets.only(top: 8.0, bottom: 8.0, right: 80.0),
-      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-      decoration: BoxDecoration(
-        color: isMe
-          ? Theme.of(context).accentColor
-          : Color(0xFFFFEFEE),
-        borderRadius: isMe
-          ? BorderRadius.only(
-            topLeft: Radius.circular(15.0),
-            bottomLeft: Radius.circular(15.0)
-          )
-          : BorderRadius.only(
-            topRight: Radius.circular(15.0),
-            bottomRight: Radius.circular(15.0)
-          )
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            message.time,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600
-            ),
-          ),
-          SizedBox(height: 8.0),
-          Text(
-            message.text,
-            style: TextStyle(
-              color: Colors.blueGrey,
-              fontSize: 16.0,
-              fontWeight: FontWeight.w600
-            ),
-          )
-        ],
-      )
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: Text(
-          widget.user.name,
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold
-          ),
+        backgroundColor: Theme.of(context).accentColor,
+        iconTheme: IconThemeData(
+          color: Theme.of(context).primaryColor
+        ),
+        centerTitle: true,
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              widget.user.name,
+              style: TextStyle(
+                fontSize: 24.0,
+                fontFamily: 'GilroyBold',
+                color: Colors.black
+              )
+            ),
+            Text(
+              'Hace 54 minutos',
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.grey[700]
+              )
+            )
+          ]
         ),
         elevation: 0.0,
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_horiz),
-            iconSize: 30.0,
-            color: Colors.white,
-            onPressed: () {},
-          ),
+          Container(
+            padding: EdgeInsets.all(8),
+            child: CircleAvatar(
+              radius: 20.0,
+              backgroundImage: AssetImage(widget.user.imageUrl),
+            )
+          )
         ],
       ),
       body: Column(
         children: <Widget>[
           Expanded(
             child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 15),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0)
-                )
+                color: Theme.of(context).accentColor
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0)
-                ),
-                child: ListView.builder(
-                  padding: EdgeInsets.only(top: 15.0),
-                  itemCount: messages.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final Message message = messages[index];
-                    bool isMe = message.sender.id == currentUser.id;
-                    return _buildMessage(message, isMe);
-                  },
-                )
+              child: ListView.builder(
+                padding: EdgeInsets.only(top: 15.0),
+                itemCount: messages.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Message message = messages[index];
+                  bool isMe = message.sender.id == currentUser.id;
+                  return new ChatMessage(message: message, isMe: isMe);
+                },
               )
+            )
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0.0, -3.0)
+                )
+              ]
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.70,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Escribe un mensaje...'
+                    ),
+                  )
+                ),
+                Container(
+                  height: 50,
+                  width: 50,
+                  padding: EdgeInsets.only(left: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(30.0)
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.send),
+                    iconSize: 25.0,
+                    color: Colors.white,
+                    onPressed: () {},
+                  )
+                )
+              ]
             )
           )
         ]

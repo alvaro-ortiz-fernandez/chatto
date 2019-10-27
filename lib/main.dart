@@ -1,5 +1,5 @@
-import 'package:chatto/screens/home-screen.dart';
 import 'package:chatto/screens/login-screen.dart';
+import 'package:chatto/screens/home-screen.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -11,10 +11,11 @@ class MyApp extends StatelessWidget {
       title: 'Chatto',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Color(0xFF2764EB),
-        accentColor: Color(0xFFF2F2F2)
+        primaryColor: Color(0xFF465EFC),
+        accentColor: Color(0xFFF6F7F2),
+        fontFamily: 'GilroyRegular'
       ),
-      home: /*HomeScreen()*/ LoginScreen(),
+      home: HomeScreen() /*LoginScreen()*/,
     );
   }
 }

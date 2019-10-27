@@ -51,6 +51,21 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
 
+  fonts:
+    - family: GilroyLight
+      fonts:
+        - asset: assets/fonts/gilroy/light/Gilroy-Light.ttf
+
+    - family: GilroyRegular
+      fonts:
+        - asset: assets/fonts/gilroy/regular/Gilroy-Regular.ttf
+        - asset: assets/fonts/gilroy/regular/Gilroy-Medium.ttf
+
+    - family: GilroyBold
+      fonts:
+        - asset: assets/fonts/gilroy/bold/Gilroy-Bold.ttf
+        - asset: assets/fonts/gilroy/bold/Gilroy-Heavy.ttf
+
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

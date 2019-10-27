@@ -10,7 +10,7 @@ class User {
   });
 }
 
-List<User> favorites = [sam, steven, olivia, john, greg];
+List<User> favorites = [sam, steven, olivia, john, greg, sophia, james];
 
 final User currentUser = User(
   id: 0,

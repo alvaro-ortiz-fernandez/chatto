@@ -1,6 +1,5 @@
-import 'package:chatto/widgets/category-selector.dart';
-import 'package:chatto/widgets/favorite-contacts.dart';
-import 'package:chatto/widgets/recent-chats.dart';
+import 'package:chatto/widgets/home/favorite-contacts.dart';
+import 'package:chatto/widgets/home/recent-chats.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,23 +13,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          iconSize: 30.0,
-          color: Colors.white,
-          onPressed: () {},
-        ),
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(
           'Chats',
           style: TextStyle(
             fontSize: 28.0,
-            fontWeight: FontWeight.bold
+            fontFamily: 'GilroyBold'
           ),
         ),
         elevation: 0.0,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.menu),
             iconSize: 30.0,
             color: Colors.white,
             onPressed: () {},
@@ -39,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: <Widget>[
-          CategorySelector(),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
