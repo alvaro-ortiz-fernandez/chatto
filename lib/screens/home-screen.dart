@@ -1,56 +1,66 @@
-import 'package:chatto/widgets/home/favorite-contacts.dart';
-import 'package:chatto/widgets/home/recent-chats.dart';
+import 'package:chatto/models/navigation-model.dart';
+import 'package:chatto/widgets/home/views/navigation-view.dart';
+import 'package:chatto/widgets/home/menu/menu-screen.dart';
 import 'package:flutter/material.dart';
+import 'package:chatto/widgets/home/menu/zoom-scaffold.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeScreenState createState() => new _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  MenuController menuController;
+  int _currentIndex = 0;
+
   @override
-  Widget build(BuildContext contest) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: Text(
-          'Chats',
-          style: TextStyle(
-            fontSize: 28.0,
-            fontFamily: 'GilroyBold'
-          ),
-        ),
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            iconSize: 30.0,
-            color: Colors.white,
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0)
-                )
-              ),
-              child: Column(
-                children: <Widget>[
-                  FavoriteContacts(),
-                  RecentChats()
-                ],
-              ),
+  void initState() {
+    super.initState();
+
+    menuController = new MenuController(
+      vsync: this,
+    )..addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    menuController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      builder: (context) => menuController,
+      child: ZoomScaffold(
+        title: navigations[_currentIndex].title,
+        menuScreen: MenuScreen(),
+        contentScreen: Layout(
+          contentBuilder: (cc) => SafeArea(
+            top: false,
+            child: IndexedStack(
+              index: _currentIndex,
+              children: navigations.map<Widget>((Navigation navigation) {
+                return NavigationView(navigation: navigation);
+              }).toList()
             )
           )
-        ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (int index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          items: navigations.map((Navigation navigation) {
+            return BottomNavigationBarItem(
+              icon: Icon(navigation.icon),
+              title: Text(navigation.title)
+            );
+          }).toList()
+        )
       )
     );
   }

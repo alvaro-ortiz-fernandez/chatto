@@ -1,5 +1,6 @@
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/models/user-model.dart';
+import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/widgets/chat/chat-message.dart';
 import 'package:flutter/material.dart';
 
@@ -45,11 +46,21 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         elevation: 0.0,
         actions: <Widget>[
-          Container(
-            padding: EdgeInsets.all(8),
-            child: CircleAvatar(
-              radius: 20.0,
-              backgroundImage: AssetImage(widget.user.imageUrl),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ProfileScreen(
+                  user: widget.user
+                )
+              )
+            ),
+            child: Container(
+              padding: EdgeInsets.all(8),
+              child: CircleAvatar(
+                radius: 20.0,
+                backgroundImage: AssetImage(widget.user.imageUrl),
+              )
             )
           )
         ],

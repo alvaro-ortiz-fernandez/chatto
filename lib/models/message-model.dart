@@ -22,21 +22,21 @@ List<Message> chats = [
     time: '5:30 PM',
     text: 'Hey, how\'s it going? What did you do today?',
     isLiked: false,
-    unread: true,
+    unread: false,
   ),
   Message(
     sender: olivia,
     time: '4:30 PM',
     text: 'Hey, how\'s it going? What did you do today?',
     isLiked: false,
-    unread: true,
+    unread: false,
   ),
   Message(
     sender: john,
     time: '3:30 PM',
     text: 'Hey, how\'s it going? What did you do today?',
     isLiked: false,
-    unread: false,
+    unread: true,
   ),
   Message(
     sender: sophia,
@@ -57,7 +57,7 @@ List<Message> chats = [
     time: '12:30 PM',
     text: 'Hey, how\'s it going? What did you do today?',
     isLiked: false,
-    unread: false,
+    unread: true,
   ),
   Message(
     sender: greg,

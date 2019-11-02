@@ -9,11 +9,7 @@ class LoginScreen extends StatelessWidget {
         children: <Widget>[
           Container(
             height: 180.0,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40.0),
-                bottomRight: Radius.circular(40.0)
-              ),
+            decoration: new BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -22,7 +18,17 @@ class LoginScreen extends StatelessWidget {
                   Colors.deepPurpleAccent[400]
                 ],
               ),
-            )
+              boxShadow: [
+                new BoxShadow(
+                  blurRadius: 5.0
+                )
+              ],
+              borderRadius: new BorderRadius.vertical(
+                bottom: new Radius.elliptical(
+                  MediaQuery.of(context).size.width, 150.0
+                )
+              ),
+            ),
           ),
           Expanded(
             child: Container(
