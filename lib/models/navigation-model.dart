@@ -1,5 +1,12 @@
-import 'package:chatto/widgets/home/views/chats-view.dart';
-import 'package:chatto/widgets/home/views/groups-view.dart';
+import 'package:chatto/screens/home-screen.dart';
+import 'package:chatto/screens/settings-screen.dart';
+import 'package:chatto/screens/users-screen.dart';
+import 'package:chatto/widgets/home/chats-view.dart';
+import 'package:chatto/widgets/home/groups-view.dart';
+import 'package:chatto/widgets/settings/settings-view.dart';
+import 'package:chatto/widgets/users/blocks-view.dart';
+import 'package:chatto/widgets/users/contacts-view.dart';
+import 'package:chatto/widgets/users/requests-view.dart';
 import 'package:flutter/material.dart';
 
 class Navigation {
@@ -7,15 +14,29 @@ class Navigation {
   final String title;
   final IconData icon;
   final Widget view;
+  final Widget
+  parent;
 
   Navigation({
     this.title,
     this.icon,
-    this.view
+    this.view,
+    this.parent
   });
 }
 
-final List<Navigation> navigations = <Navigation>[
-  Navigation(title: 'Chats', icon: Icons.chat_bubble, view: ChatsView()),
-  Navigation(title: 'Grupos', icon: Icons.supervisor_account, view: GroupsView())
+final List<Navigation> homeNavigations = <Navigation>[
+  Navigation(title: 'Chats', icon: Icons.chat_bubble, view: ChatsView(), parent: HomeScreen(currentIndex: 0)),
+  Navigation(title: 'Grupos', icon: Icons.supervisor_account, view: GroupsView(), parent: HomeScreen(currentIndex: 1))
+];
+
+final List<Navigation> usersNavigations = <Navigation>[
+  Navigation(title: 'Contactos', icon: Icons.supervisor_account, view: ContactsView(), parent: UsersScreen(currentIndex: 0)),
+  Navigation(title: 'Peticiones', icon: Icons.account_circle, view: RequestsView(), parent: UsersScreen(currentIndex: 1)),
+  Navigation(title: 'Bloqueados', icon: Icons.block, view: BlocksView(), parent: UsersScreen(currentIndex: 2))
+];
+
+final List<Navigation> settingsNavigations = <Navigation>[
+  Navigation(title: 'Ajustes', icon: Icons.settings, view: SettingsView(), parent: SettingsScreen()),
+  Navigation(title: 'Salir', icon: Icons.power_settings_new, view: Container(), parent: Container())
 ];

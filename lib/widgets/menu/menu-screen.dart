@@ -1,19 +1,11 @@
+import 'package:chatto/models/navigation-model.dart';
 import 'package:chatto/models/user-model.dart';
-import 'package:chatto/widgets/home/menu/circular-image.dart';
-import 'package:chatto/widgets/home/menu/zoom-scaffold.dart';
+import 'package:chatto/widgets/menu/circular-image.dart';
+import 'package:chatto/widgets/menu/zoom-scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MenuScreen extends StatelessWidget {
-  final List<MenuItem> mainOptions = [
-    MenuItem(Icons.search, 'Search'),
-    MenuItem(Icons.shopping_basket, 'Basket')
-  ];
-
-  final List<MenuItem> secondaryOptions = [
-    MenuItem(Icons.settings, 'Ajustes'),
-    MenuItem(Icons.power_settings_new, 'Salir')
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -51,40 +43,41 @@ class MenuScreen extends StatelessWidget {
               ],
             ),
             Spacer(),
-            buildMenuList(mainOptions),
+            buildMenuList(context, homeNavigations),
             Spacer(),
-            buildMenuList(secondaryOptions)
+            buildMenuList(context, usersNavigations),
+            Spacer(),
+            buildMenuList(context, settingsNavigations)
           ]
         )
       )
     );
   }
 
-  buildMenuList(List<MenuItem> menuItems) {
+  buildMenuList(BuildContext context, List<Navigation> navigations) {
     return Column(
-      children: menuItems.map((item) {
+      children: navigations.map((navigation) {
         return ListTile(
           leading: Icon(
-            item.icon,
+            navigation.icon,
             color: Colors.white,
             size: 20,
           ),
           title: Text(
-            item.title,
+            navigation.title,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.white),
           ),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => navigation.parent
+            )
+          )
         );
       }).toList(),
     );
   }
-}
-
-class MenuItem {
-  String title;
-  IconData icon;
-
-  MenuItem(this.icon, this.title);
 }

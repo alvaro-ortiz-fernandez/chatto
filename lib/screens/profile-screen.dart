@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           )
                         ),
                         Text(
-                          'Hace 54 minutos',
+                          'olivia@mail.com',
                           style: TextStyle(
                             fontSize: 16.0,
                             color: Colors.grey[700]
@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Container(
                     child: Text(
-                      'Antigüedad: 3 meses',
+                      'Última conexión: Hace 54 minutos',
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.grey[700]

@@ -5,12 +5,14 @@ class ZoomScaffold extends StatefulWidget {
   final String title;
   final Widget menuScreen;
   final Layout contentScreen;
+  final FloatingActionButton floatingActionButton;
   final BottomNavigationBar bottomNavigationBar;
 
   ZoomScaffold({
     this.title,
     this.menuScreen,
     this.contentScreen,
+    this.floatingActionButton,
     this.bottomNavigationBar
   });
 
@@ -106,6 +108,7 @@ class _ZoomScaffoldState extends State<ZoomScaffold> with TickerProviderStateMix
                 )
               ),
               body: widget.contentScreen.contentBuilder(context),
+              floatingActionButton: widget.floatingActionButton,
               bottomNavigationBar: widget.bottomNavigationBar
             )
           )

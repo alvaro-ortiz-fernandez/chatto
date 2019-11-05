@@ -5,17 +5,21 @@ import 'package:chatto/widgets/menu/zoom-scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class UsersScreen extends StatefulWidget {
   final int currentIndex;
 
-  HomeScreen({ this.currentIndex });
+  UsersScreen({ this.currentIndex });
 
   @override
-  _HomeScreenState createState() => new _HomeScreenState();
+  _UsersScreenState createState() => new _UsersScreenState(this.currentIndex);
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin {
+
   MenuController menuController;
+  int currentIndex;
+
+  _UsersScreenState(this.currentIndex);
 
   @override
   void initState() {
@@ -34,31 +38,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    int _currentIndex = widget.currentIndex;
     return ChangeNotifierProvider(
       builder: (context) => menuController,
       child: ZoomScaffold(
-        title: homeNavigations[_currentIndex].title,
+        title: usersNavigations[currentIndex].title,
         menuScreen: MenuScreen(),
         contentScreen: Layout(
           contentBuilder: (cc) => SafeArea(
             top: false,
             child: IndexedStack(
-              index: _currentIndex,
-              children: homeNavigations.map<Widget>((Navigation navigation) {
+              index: currentIndex,
+              children: usersNavigations.map<Widget>((Navigation navigation) {
                 return NavigationView(navigation: navigation);
               }).toList()
             )
           )
         ),
+        floatingActionButton: currentIndex == 0
+          ? FloatingActionButton(
+            onPressed: () {},
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            backgroundColor: Theme.of(context).primaryColor,
+          )
+          : null,
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: currentIndex,
           onTap: (int index) {
             setState(() {
-              _currentIndex = index;
+              currentIndex = index;
             });
           },
-          items: homeNavigations.map((Navigation navigation) {
+          items: usersNavigations.map((Navigation navigation) {
             return BottomNavigationBarItem(
               icon: Icon(navigation.icon),
               title: Text(navigation.title)
