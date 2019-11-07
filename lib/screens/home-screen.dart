@@ -6,16 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+
+  static final String id = 'home_screen';
+
   final int currentIndex;
 
   HomeScreen({ this.currentIndex });
 
   @override
-  _HomeScreenState createState() => new _HomeScreenState();
+  _HomeScreenState createState() => new _HomeScreenState(this.currentIndex);
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+
   MenuController menuController;
+  int currentIndex;
+
+  _HomeScreenState(this.currentIndex);
 
   @override
   void initState() {
@@ -34,17 +41,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    int _currentIndex = widget.currentIndex;
     return ChangeNotifierProvider(
       builder: (context) => menuController,
       child: ZoomScaffold(
-        title: homeNavigations[_currentIndex].title,
+        title: homeNavigations[currentIndex].title,
         menuScreen: MenuScreen(),
         contentScreen: Layout(
           contentBuilder: (cc) => SafeArea(
             top: false,
             child: IndexedStack(
-              index: _currentIndex,
+              index: currentIndex,
               children: homeNavigations.map<Widget>((Navigation navigation) {
                 return NavigationView(navigation: navigation);
               }).toList()
@@ -52,10 +58,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           )
         ),
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: currentIndex,
           onTap: (int index) {
             setState(() {
-              _currentIndex = index;
+              currentIndex = index;
             });
           },
           items: homeNavigations.map((Navigation navigation) {

@@ -1,5 +1,4 @@
 import 'package:chatto/models/user-model.dart';
-import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:flutter/material.dart';
 

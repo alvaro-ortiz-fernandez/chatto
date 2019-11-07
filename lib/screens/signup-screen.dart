@@ -1,16 +1,17 @@
-import 'package:chatto/screens/signup-screen.dart';
+import 'package:chatto/screens/login-screen.dart';
+import 'package:chatto/services/auth-service.dart';
 import 'package:chatto/widgets/auth/password-input.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
 
-  static final String id = 'login_screen';
+  static final String id = 'signup_screen';
 
   @override
-  _LoginScreenState createState() => new _LoginScreenState();
+  _SignupScreenState createState() => new _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             )
                           ),
                           Text(
-                            'Inicia sesión en tu cuenta',
+                            'Crea una cuenta',
                             style: TextStyle(
                               fontSize: 18.0,
                               fontFamily: 'GilroyRegular',
@@ -146,9 +147,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: InkWell(
                                         child: Center(
                                           child:MaterialButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              //AuthService.signup(context, name, email, password)
+                                            },
                                             child: Text(
-                                              'Entrar',
+                                              'Crear',
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontFamily: 'GilroyBold',
@@ -172,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: <Widget>[
                                   Text(
-                                    '¿No tienes cuenta?',
+                                    '¿Ya tienes una cuenta?',
                                     style: TextStyle(
                                       fontSize: 18.0,
                                       fontFamily: 'GilroyRegular',
@@ -181,9 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   SizedBox(width: 5),
                                   GestureDetector(
-                                    onTap: () => Navigator.pushNamed(context, SignupScreen.id),
+                                    onTap: () => Navigator.pushNamed(context, LoginScreen.id),
                                     child: Text(
-                                      'Crea una aquí',
+                                      'Inicia sesión aquí',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         fontFamily: 'GilroyBold',
