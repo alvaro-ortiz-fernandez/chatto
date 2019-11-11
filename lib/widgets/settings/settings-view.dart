@@ -1,4 +1,6 @@
 import 'package:chatto/models/settings-model.dart';
+import 'package:chatto/screens/settings-screen.dart';
+import 'package:chatto/services/shared-preferences-service.dart';
 import 'package:flutter/material.dart';
 
 class SettingsView extends StatefulWidget {
@@ -7,6 +9,17 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+
+  List<SettingGroup> settings = SharedPreferencesService.settings;
+
+  @override
+  void initState() {
+    super.initState();
+
+    SettingsScreen.of(context).loadSharedPreferences()
+      .then((val) => setState(() => settings = SharedPreferencesService.settings))
+      .catchError((error) {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +54,13 @@ class _SettingsViewState extends State<SettingsView> {
                             final Setting setting = settingGroup.settings[index];
                             return SwitchListTile(
                               contentPadding: EdgeInsets.all(0),
-                              value: setting.switched,
-                              onChanged: (val) => setState(() => setting.switched = val),
+                              value: setting.enabled,
+                              onChanged: (newValue) =>
+                                setState(() {
+                                  SettingsScreen.of(context).updateSetting(setting, newValue)
+                                    .then((val) => setState(() => setting.enabled = newValue))
+                                    .catchError((error) {});
+                                }),
                               title: Text(
                                 setting.title,
                                 style: TextStyle(

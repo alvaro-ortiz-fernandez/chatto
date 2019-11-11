@@ -70,12 +70,14 @@ class MenuScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Colors.white),
           ),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => navigation.parent
+          onTap: () => navigation.onTap != null
+            ? navigation.onTap(context)
+            : Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => navigation.parent
+              )
             )
-          )
         );
       }).toList(),
     );

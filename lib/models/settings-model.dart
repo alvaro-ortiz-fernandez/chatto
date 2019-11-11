@@ -1,10 +1,14 @@
 class Setting {
   final String title;
-  bool switched;
+  final String sharedPreferenceKey;
+  bool enabled;
+  final bool defaultValue;
 
   Setting({
     this.title,
-    this.switched
+    this.sharedPreferenceKey,
+    this.enabled,
+    this.defaultValue
   });
 }
 
@@ -17,32 +21,3 @@ class SettingGroup {
     this.settings
   });
 }
-
-final List<SettingGroup> settings = [
-  SettingGroup(
-    title: 'Notificaciones',
-    settings: [
-      Setting(
-        title: 'Nuevo mensaje (individual)',
-        switched: true
-      ),
-      Setting(
-        title: 'Nuevo mensaje (individual)',
-        switched: true
-      ),
-      Setting(
-        title: 'Usuario conectado',
-        switched: false
-      )
-    ]
-  ),
-  SettingGroup(
-    title: 'Seguridad',
-    settings: [
-      Setting(
-        title: 'Cerrar sesión automáticamente al salir de la aplicación',
-        switched: false
-      )
-    ]
-  )
-];

@@ -1,6 +1,7 @@
 import 'package:chatto/screens/home-screen.dart';
 import 'package:chatto/screens/settings-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
+import 'package:chatto/services/auth-service.dart';
 import 'package:chatto/widgets/home/chats-view.dart';
 import 'package:chatto/widgets/home/groups-view.dart';
 import 'package:chatto/widgets/settings/settings-view.dart';
@@ -14,14 +15,15 @@ class Navigation {
   final String title;
   final IconData icon;
   final Widget view;
-  final Widget
-  parent;
+  final Widget parent;
+  final Function onTap;
 
   Navigation({
     this.title,
     this.icon,
     this.view,
-    this.parent
+    this.parent,
+    this.onTap
   });
 }
 
@@ -38,5 +40,5 @@ final List<Navigation> usersNavigations = <Navigation>[
 
 final List<Navigation> settingsNavigations = <Navigation>[
   Navigation(title: 'Ajustes', icon: Icons.settings, view: SettingsView(), parent: SettingsScreen()),
-  Navigation(title: 'Salir', icon: Icons.power_settings_new, view: Container(), parent: Container())
+  Navigation(title: 'Salir', icon: Icons.power_settings_new, onTap: (context) => AuthService.logout(context))
 ];

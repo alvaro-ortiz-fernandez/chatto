@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 
 class PasswordInput extends StatefulWidget {
+
+  final FormFieldSetter<String> onSaved;
+
+  PasswordInput({ this.onSaved });
+
   @override
-  _PasswordInputState createState() => _PasswordInputState();
+  _PasswordInputState createState() => _PasswordInputState(onSaved);
 }
 
 class _PasswordInputState extends State<PasswordInput> {
 
   bool hidePass = true;
+  FormFieldSetter<String> onSaved;
+
+  _PasswordInputState(this.onSaved);
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      onSaved: onSaved,
       obscureText: hidePass,
       decoration: InputDecoration(
         hintText: 'Contraseña',
