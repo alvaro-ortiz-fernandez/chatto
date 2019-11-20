@@ -1,6 +1,6 @@
 import 'package:chatto/models/settings-model.dart';
 import 'package:chatto/screens/settings-screen.dart';
-import 'package:chatto/services/shared-preferences-service.dart';
+import 'package:chatto/services/settings-service.dart';
 import 'package:flutter/material.dart';
 
 class SettingsView extends StatefulWidget {
@@ -10,14 +10,14 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
 
-  List<SettingGroup> settings = SharedPreferencesService.settings;
+  List<SettingGroup> settings = SettingsService.settings;
 
   @override
   void initState() {
     super.initState();
 
     SettingsScreen.of(context).loadSharedPreferences()
-      .then((val) => setState(() => settings = SharedPreferencesService.settings))
+      .then((val) => setState(() => settings = SettingsService.settings))
       .catchError((error) {});
   }
 

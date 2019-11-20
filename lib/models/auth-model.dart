@@ -1,22 +1,73 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
 
 class UserData {
+  final String id;
   final String name;
   final String email;
   final String imageUrl;
+  final List<String> contacts;
+  final List<String> requests;
+  final List<String> blocks;
 
   UserData({
+    this.id,
     this.name,
     this.email,
-    this.imageUrl
+    this.imageUrl,
+    this.contacts,
+    this.requests,
+    this.blocks
   });
+
+  factory UserData.emptyUser() {
+    return UserData(
+      id: '',
+      name: '',
+      email: '',
+      imageUrl: '',
+      contacts: List<String>(),
+      requests: List<String>(),
+      blocks: List<String>()
+    );
+  }
 
   factory UserData.fromDocument(DocumentSnapshot doc) {
     return UserData(
+      id: doc['id'] ?? '',
       name: doc['name'] ?? '',
       email: doc['email'] ?? '',
-      imageUrl: doc['imageUrl'] ?? ''
+      imageUrl: doc['imageUrl'] ?? '',
+      contacts: doc['contacts'] != null ? List.from(doc['contacts']) : List<String>(),
+      requests: doc['requests'] != null ? List.from(doc['requests']) : List<String>(),
+      blocks: doc['blocks'] != null ? List.from(doc['blocks']) : List<String>()
     );
+  }
+
+  factory UserData.fromJson(String str) {
+    Map<String, dynamic> jsonData = json.decode(str);
+    return UserData(
+      id: jsonData["id"],
+      name: jsonData["name"],
+      email: jsonData["email"],
+      imageUrl: jsonData["imageUrl"],
+      contacts: jsonData['contacts'] != null ? List.from(jsonData['contacts']) : List<String>(),
+      requests: jsonData['requests'] != null ? List.from(jsonData['requests']) : List<String>(),
+      blocks: jsonData['blocks'] != null ? List.from(jsonData['blocks']) : List<String>()
+    );
+  }
+
+  String toJson() {
+    Map<String, dynamic> map = {
+      "id": id,
+      "name": name,
+      "email": email,
+      "imageUrl": imageUrl,
+      "contacts": contacts,
+      "requests": requests,
+      "blocks": blocks
+    };
+    return json.encode(map);
   }
 }
 
@@ -59,3 +110,73 @@ class LoginAttemp {
     }
   }
 }
+
+final UserData greg = UserData(
+  id: '1',
+  name: 'Greg',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/greg.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData james = UserData(
+  id: '2',
+  name: 'James',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/james.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData john = UserData(
+  id: '3',
+  name: 'John',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/john.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData olivia = UserData(
+  id: '4',
+  name: 'Olivia',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/olivia.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData sam = UserData(
+  id: '5',
+  name: 'Sam',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/sam.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData sophia = UserData(
+  id: '6',
+  name: 'Sophia',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/sophia.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);
+
+final UserData steven = UserData(
+  id: '7',
+  name: 'Steven',
+  email: 'test@mail.com',
+  imageUrl: 'assets/images/steven.jpg',
+  contacts: List<String>(),
+  requests: List<String>(),
+  blocks: List<String>()
+);

@@ -7,10 +7,10 @@ class NavigationView extends StatefulWidget {
   final Navigation navigation;
 
   @override
-  _NavigationViewState createState() => _NavigationViewState();
+  NavigationViewState createState() => NavigationViewState();
 }
 
-class _NavigationViewState extends State<NavigationView> {
+class NavigationViewState extends State<NavigationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

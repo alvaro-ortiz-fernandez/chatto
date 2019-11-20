@@ -195,8 +195,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                             _formKey.currentState.save();
 
                                             if (!validForm()) {
-                                              SnackbarService.showInfoSnackbar(key: _scaffoldKey,
-                                                content: 'Por favor, rellene todos los campos.');
+                                              SnackbarService.showInfoSnackbar(
+                                                key: _scaffoldKey,
+                                                content: 'Por favor, rellene todos los campos.'
+                                              );
                                             } else {
                                               AuthService
                                                 .signup(_name, _email, _password)

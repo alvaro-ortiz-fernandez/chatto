@@ -1,7 +1,7 @@
-import 'package:chatto/models/user-model.dart';
+import 'package:chatto/models/auth-model.dart';
 
 class Message {
-  final User sender;
+  final UserData sender;
   final String time;
   final String text;
   final bool isLiked;
@@ -77,7 +77,7 @@ List<Message> messages = [
     unread: true,
   ),
   Message(
-    sender: currentUser,
+    sender: james,
     time: '4:30 PM',
     text: 'Just walked my doge. She was super duper cute. The best pupper!!',
     isLiked: false,
@@ -98,7 +98,7 @@ List<Message> messages = [
     unread: true,
   ),
   Message(
-    sender: currentUser,
+    sender: james,
     time: '2:30 PM',
     text: 'Nice! What kind of food did you eat?',
     isLiked: false,

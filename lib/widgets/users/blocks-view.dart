@@ -1,14 +1,27 @@
-import 'package:chatto/models/user-model.dart';
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
+import 'package:chatto/screens/users-screen.dart';
+import 'package:chatto/services/dialog-service.dart';
 import 'package:flutter/material.dart';
 
 
 class BlocksView extends StatefulWidget {
   @override
-  _BlocksViewState createState() => new _BlocksViewState();
+  BlocksViewState createState() => new BlocksViewState();
 }
 
-class _BlocksViewState extends State<BlocksView> {
+class BlocksViewState extends State<BlocksView> {
+
+  List<UserData> blocks = List<UserData>();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      blocks = UsersScreen.of(context).blocks;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -25,9 +38,9 @@ class _BlocksViewState extends State<BlocksView> {
                 ),
                 margin: EdgeInsets.only(top: 5.0),
                 child: ListView.builder(
-                  itemCount: favorites.length,
+                  itemCount: blocks.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final User user = favorites[index];
+                    final UserData user = blocks[index];
                     return GestureDetector(
                       onTap: () => Navigator.push(
                         context,
@@ -64,7 +77,7 @@ class _BlocksViewState extends State<BlocksView> {
                                     Container(
                                       width: MediaQuery.of(context).size.width * 0.30,
                                       child: Text(
-                                        'testAtestAtest@mail.com',
+                                        user.email,
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 15.0
@@ -84,21 +97,9 @@ class _BlocksViewState extends State<BlocksView> {
                                     IconButton(
                                       icon: Icon(Icons.report_off),
                                       iconSize: 28.0,
-                                      color: Theme.of(context).primaryColor,
+                                      color: Colors.black54,
                                       tooltip: 'Desbloquear',
-                                      onPressed: () {
-                                        SnackBar snackBar = SnackBar(
-                                          backgroundColor: Theme.of(context).primaryColor,
-                                          elevation: 10,
-                                          duration: Duration(seconds: 3),
-                                          content: Text('Has dejado de ignorar a ${user.name}.'),
-                                          action: SnackBarAction(
-                                            label: 'OK',
-                                            onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-                                          ),
-                                        );
-                                        Scaffold.of(context).showSnackBar(snackBar);
-                                      }
+                                      onPressed: () => mostrarAlertaDesbloqueo(user.name)
                                     )
                                   ],
                                 )
@@ -115,6 +116,15 @@ class _BlocksViewState extends State<BlocksView> {
           ]
         )
       )
+    );
+  }
+
+  Future<bool> mostrarAlertaDesbloqueo(String userName) async {
+    return DialogService.showDefaultDialog(
+      context: context,
+      title: 'Desbloquear usuario',
+      description: '¿Desea desbloquear a $userName?',
+      action: 'Desbloquear'
     );
   }
 }

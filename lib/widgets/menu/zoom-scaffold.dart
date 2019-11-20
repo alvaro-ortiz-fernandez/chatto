@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 class ZoomScaffold extends StatefulWidget {
   final String title;
+  final GlobalKey<ScaffoldState> scaffoldKey;
   final Widget menuScreen;
   final Layout contentScreen;
   final FloatingActionButton floatingActionButton;
@@ -10,6 +11,7 @@ class ZoomScaffold extends StatefulWidget {
 
   ZoomScaffold({
     this.title,
+    this.scaffoldKey,
     this.menuScreen,
     this.contentScreen,
     this.floatingActionButton,
@@ -86,12 +88,14 @@ class _ZoomScaffoldState extends State<ZoomScaffold> with TickerProviderStateMix
       children: [
         Container(
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             body: widget.menuScreen,
           ),
         ),
         zoomAndSlideContent(
           Container(
             child: Scaffold(
+              key: widget.scaffoldKey,
               backgroundColor: Theme.of(context).accentColor,
               appBar: AppBar(
                 title: Text(widget.title),

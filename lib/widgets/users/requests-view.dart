@@ -1,14 +1,26 @@
-import 'package:chatto/models/user-model.dart';
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
+import 'package:chatto/screens/users-screen.dart';
+import 'package:chatto/services/dialog-service.dart';
 import 'package:flutter/material.dart';
-
 
 class RequestsView extends StatefulWidget {
   @override
-  _RequestsViewState createState() => new _RequestsViewState();
+  RequestsViewState createState() => new RequestsViewState();
 }
 
-class _RequestsViewState extends State<RequestsView> {
+class RequestsViewState extends State<RequestsView> {
+
+  List<UserData> requests = List<UserData>();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      requests = UsersScreen.of(context).requests;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -25,9 +37,9 @@ class _RequestsViewState extends State<RequestsView> {
                 ),
                 margin: EdgeInsets.only(top: 5.0),
                 child: ListView.builder(
-                  itemCount: favorites.length,
+                  itemCount: requests.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final User user = favorites[index];
+                    final UserData user = requests[index];
                     return GestureDetector(
                       onTap: () => Navigator.push(
                         context,
@@ -64,7 +76,7 @@ class _RequestsViewState extends State<RequestsView> {
                                     Container(
                                       width: MediaQuery.of(context).size.width * 0.30,
                                       child: Text(
-                                        'testAtestAtest@mail.com',
+                                        user.email,
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 15.0
@@ -86,38 +98,14 @@ class _RequestsViewState extends State<RequestsView> {
                                       iconSize: 28.0,
                                       color: Theme.of(context).primaryColor,
                                       tooltip: 'Aceptar',
-                                      onPressed: () {
-                                        SnackBar snackBar = SnackBar(
-                                          backgroundColor: Theme.of(context).primaryColor,
-                                          elevation: 10,
-                                          duration: Duration(seconds: 3),
-                                          content: Text('Petición de ${user.name} aceptada.'),
-                                          action: SnackBarAction(
-                                            label: 'OK',
-                                            onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-                                          ),
-                                        );
-                                        Scaffold.of(context).showSnackBar(snackBar);
-                                      }
+                                      onPressed: () => mostrarAlertaAceptacion(user.name)
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.close),
                                       iconSize: 28.0,
                                       color: Colors.red,
                                       tooltip: 'Rechazar',
-                                      onPressed: () {
-                                        SnackBar snackBar = SnackBar(
-                                          backgroundColor: Theme.of(context).primaryColor,
-                                          elevation: 10,
-                                          duration: Duration(seconds: 3),
-                                          content: Text('Petición de ${user.name} rechazada.'),
-                                          action: SnackBarAction(
-                                            label: 'OK',
-                                            onPressed: () => Scaffold.of(context).hideCurrentSnackBar(),
-                                          ),
-                                        );
-                                        Scaffold.of(context).showSnackBar(snackBar);
-                                      }
+                                      onPressed: () => mostrarAlertaDenegacion(user.name)
                                     )
                                   ],
                                 )
@@ -134,6 +122,24 @@ class _RequestsViewState extends State<RequestsView> {
           ]
         )
       )
+    );
+  }
+
+  Future<bool> mostrarAlertaAceptacion(String userName) async {
+    return DialogService.showInfoDialog(
+      context: context,
+      title: 'Aceptar invitación',
+      description: '¿Desea agregar a $userName?',
+      action: 'ACEPTAR'
+    );
+  }
+
+  Future<bool> mostrarAlertaDenegacion(String userName) async {
+    return DialogService.showDangerDialog(
+      context: context,
+      title: 'Rechazar invitación',
+      description: '¿Desea rechazar a $userName?',
+      action: 'RECHAZAR'
     );
   }
 }

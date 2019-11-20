@@ -1,15 +1,33 @@
-import 'package:chatto/models/user-model.dart';
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
+import 'package:chatto/screens/users-screen.dart';
+import 'package:chatto/services/dialog-service.dart';
+import 'package:chatto/services/snackbar-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
-
 class ContactsView extends StatefulWidget {
+  final UserData currentUser;
+
+  ContactsView({ this.currentUser });
+
   @override
-  _ContactsViewState createState() => new _ContactsViewState();
+  ContactsViewState createState() => new ContactsViewState();
 }
 
-class _ContactsViewState extends State<ContactsView> {
+class ContactsViewState extends State<ContactsView> {
+
+  List<UserData> contacts = List<UserData>();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      contacts = UsersScreen.of(context).contacts;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -26,9 +44,9 @@ class _ContactsViewState extends State<ContactsView> {
                 ),
                 margin: EdgeInsets.only(top: 5.0),
                 child: ListView.builder(
-                  itemCount: favorites.length,
+                  itemCount: contacts.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final User user = favorites[index];
+                    final UserData user = contacts[index];
                     return GestureDetector(
                       onTap: () => Navigator.push(
                         context,
@@ -65,7 +83,7 @@ class _ContactsViewState extends State<ContactsView> {
                                     Container(
                                       width: MediaQuery.of(context).size.width * 0.30,
                                       child: Text(
-                                        'testAtestAtest@mail.com',
+                                        user.email,
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 15.0
@@ -91,7 +109,8 @@ class _ContactsViewState extends State<ContactsView> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => ChatScreen(
-                                            user: user
+                                            currentUser: widget.currentUser,
+                                            talkingUser: user,
                                           )
                                         )
                                       )
@@ -108,7 +127,13 @@ class _ContactsViewState extends State<ContactsView> {
                                       iconSize: 28.0,
                                       color: Colors.red,
                                       tooltip: 'Eliminar',
-                                      onPressed: () => mostrarAlertaEliminacion(user.name)
+                                      onPressed: () {
+                                        mostrarAlertaEliminacion(user.name)
+                                          .then((decision) {
+                                            if (decision == true)
+                                              UsersScreen.of(context).eliminarContacto(user);
+                                          });
+                                      }
                                     )
                                   ],
                                 )
@@ -128,59 +153,21 @@ class _ContactsViewState extends State<ContactsView> {
     );
   }
 
-
   Future<bool> mostrarAlertaBloqueo(String userName) async {
-    return mostrarAlerta(
-      'Bloquear contacto',
-      '¿Desea bloquear a $userName?',
-      'BLOQUEAR'
+    return DialogService.showDefaultDialog(
+      context: context,
+      title: 'Bloquear contacto',
+      description: '¿Desea bloquear a $userName?',
+      action: 'BLOQUEAR'
     );
   }
 
   Future<bool> mostrarAlertaEliminacion(String userName) async {
-    return mostrarAlerta(
-      'Eliminar contacto',
-      '¿Desea eliminar a $userName?',
-      'ELIMINAR'
-    );
-  }
-
-  // Método que muestra la alerta de bloquear usuario
-  Future<bool> mostrarAlerta(String title, String description, String action) async {
-    return showDialog<bool>(
+    return DialogService.showDangerDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            title,
-            style: TextStyle(
-              fontFamily: 'GilroyBold'
-            )
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(description)
-              ]
-            )
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(
-                action,
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontFamily: 'GilroyBold'
-                )
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                return true;
-              }
-            )
-          ]
-        );
-      }
+      title: 'Eliminar contacto',
+      description: '¿Desea eliminar a $userName?',
+      action: 'ELIMINAR'
     );
   }
 }

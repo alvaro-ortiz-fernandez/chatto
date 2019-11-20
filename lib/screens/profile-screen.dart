@@ -1,9 +1,9 @@
-import 'package:chatto/models/user-model.dart';
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/widgets/profile/profile-stadistics.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final User user;
+  final UserData user;
 
   ProfileScreen({ this.user });
 

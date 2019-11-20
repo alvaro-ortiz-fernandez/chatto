@@ -1,9 +1,15 @@
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:flutter/material.dart';
 
 class GroupsView extends StatelessWidget {
+
+  final UserData currentUser;
+
+  GroupsView({ this.currentUser });
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -28,7 +34,8 @@ class GroupsView extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ChatScreen(
-                            user: chat.sender
+                            currentUser: currentUser,
+                            talkingUser: chat.sender,
                           )
                         )
                       ),

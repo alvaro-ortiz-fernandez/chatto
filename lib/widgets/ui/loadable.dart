@@ -1,3 +1,5 @@
+import 'package:chatto/models/auth-model.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 abstract class LoadableWidget {
@@ -6,12 +8,12 @@ abstract class LoadableWidget {
   String getLoadingTitle();
 }
 
+
 /// ------------------------------------------------------------
-/// Clase de la que deben extender las pantallas que
-/// quieren mostrar la animación de cargando
+/// Clase de la que deben extender las pantallas que quieren mostrar la animación de cargando
 /// ------------------------------------------------------------
 mixin Loadable<T extends StatefulWidget> on State<T> implements LoadableWidget {
-  bool loading = false;
+  bool loading = true;
 
   void startLoading() {
     setState(() {

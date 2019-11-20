@@ -1,13 +1,14 @@
+import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
-import 'package:chatto/models/user-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/widgets/chat/chat-message.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  final User user;
+  final UserData currentUser;
+  final UserData talkingUser;
 
-  ChatScreen({ this.user });
+  ChatScreen({ this.currentUser, this.talkingUser });
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -28,7 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              widget.user.name,
+              widget.talkingUser.name,
               style: TextStyle(
                 fontSize: 24.0,
                 fontFamily: 'GilroyBold',
@@ -51,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
               context,
               MaterialPageRoute(
                 builder: (_) => ProfileScreen(
-                  user: widget.user
+                  user: widget.talkingUser
                 )
               )
             ),
@@ -59,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: EdgeInsets.all(8),
               child: CircleAvatar(
                 radius: 20.0,
-                backgroundImage: AssetImage(widget.user.imageUrl),
+                backgroundImage: AssetImage(widget.talkingUser.imageUrl),
               )
             )
           )
@@ -78,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: messages.length,
                 itemBuilder: (BuildContext context, int index) {
                   final Message message = messages[index];
-                  bool isMe = message.sender.id == currentUser.id;
+                  bool isMe = message.sender.id == widget.currentUser.id;
                   return new ChatMessage(message: message, isMe: isMe);
                 },
               )

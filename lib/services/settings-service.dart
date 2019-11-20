@@ -1,7 +1,7 @@
 import 'package:chatto/models/settings-model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPreferencesService {
+class SettingsService {
 
   static List<SettingGroup> settings = [
     SettingGroup(
@@ -41,31 +41,31 @@ class SharedPreferencesService {
   ];
 
 
-  static Future<void> loadSharedPreferences() async {
+  static Future<void> loadSettings() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     for (final SettingGroup settingGroup in settings) {
       for (final Setting setting in settingGroup.settings) {
-        setting.enabled = (_getSharedPreference(prefs, setting));
+        setting.enabled = (_getSetting(prefs, setting));
       }
     }
   }
 
-  static Future<bool> getSharedPreference(Setting setting) async {
+  static Future<bool> getSetting(Setting setting) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return _getSharedPreference(prefs, setting);
+    return _getSetting(prefs, setting);
   }
 
-  static bool _getSharedPreference(SharedPreferences prefs, Setting setting) {
+  static bool _getSetting(SharedPreferences prefs, Setting setting) {
     return prefs.getBool(setting.sharedPreferenceKey) ?? setting.defaultValue;
   }
 
-  static Future<bool> setSharedPreference(Setting setting, bool newValue) async {
+  static Future<bool> setSetting(Setting setting, bool newValue) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return await _setSharedPreference(prefs, setting, newValue);
+    return await _setSetting(prefs, setting, newValue);
   }
 
-  static Future<bool> _setSharedPreference(SharedPreferences prefs, Setting setting, bool newValue) async {
+  static Future<bool> _setSetting(SharedPreferences prefs, Setting setting, bool newValue) async {
     bool completed =  await prefs.setBool(setting.sharedPreferenceKey, newValue);
     setting.enabled = newValue;
     return completed;
