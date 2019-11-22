@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:chatto/models/auth-model.dart';
+import 'package:chatto/models/event-model.dart';
 import 'package:chatto/models/navigation-model.dart';
 import 'package:chatto/services/snackbar-service.dart';
 import 'package:chatto/services/users-service.dart';
@@ -27,9 +30,14 @@ class UsersScreen extends StatefulWidget {
 class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin, Loadable {
 
   static UserData _currentUser = UserData.emptyUser();
-  List<UserData> contacts = [];
-  List<UserData> requests = [];
-  List<UserData> blocks = [];
+
+  StreamSubscription contactsChangedSubscription;
+  StreamSubscription requestsChangedSubscription;
+  StreamSubscription blocksChangedSubscription;
+
+  List<UserData> contacts = List<UserData>();
+  List<UserData> requests = List<UserData>();
+  List<UserData> blocks = List<UserData>();
 
   List<Navigation> usersNavigations = <Navigation>[
     Navigation(title: 'Contactos', icon: Icons.supervisor_account, view: ContactsView(currentUser: _currentUser), parent: UsersScreen(currentIndex: 0)),
@@ -45,7 +53,52 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
 
   UsersScreenState(this.currentIndex);
 
-  _loadData() async {
+  @override
+  void initState() {
+    super.initState();
+
+    menuController = new MenuController(
+      vsync: this,
+    )..addListener(() => setState(() {}));
+
+    contactsChangedSubscription = eventBus
+      .on<ContactsChangedEvent>()
+      .listen((ContactsChangedEvent event) {
+        setState(() => contacts = event.currentContacts);
+      });
+
+    requestsChangedSubscription = eventBus
+      .on<RequestsChangedEvent>()
+      .listen((RequestsChangedEvent event) {
+        setState(() => requests = event.currentRequests);
+      });
+
+    blocksChangedSubscription = eventBus
+      .on<BlocksChangedEvent>()
+      .listen((BlocksChangedEvent event) {
+        setState(() => blocks = event.currentBlocks);
+      });
+
+    loadData();
+  }
+
+  @override
+  void dispose() {
+    menuController.dispose();
+    super.dispose();
+
+    if (contactsChangedSubscription != null)
+      contactsChangedSubscription.cancel();
+
+    if (requestsChangedSubscription != null)
+      requestsChangedSubscription.cancel();
+
+    if (blocksChangedSubscription != null)
+      blocksChangedSubscription.cancel();
+  }
+
+  @override
+  Future<void> loadData() async {
     startLoading();
     setState(() => loadError = false);
 
@@ -69,23 +122,6 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
     } finally {
       stopLoading();
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    menuController = new MenuController(
-      vsync: this,
-    )..addListener(() => setState(() {}));
-
-    _loadData();
-  }
-
-  @override
-  void dispose() {
-    menuController.dispose();
-    super.dispose();
   }
 
   @override
@@ -142,71 +178,6 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
               title: Text(navigation.title)
             );
           }).toList()
-        )
-      )
-    );
-  }
-
-  Widget getLoadErrorBody() {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(
-              image: AssetImage('assets/images/error/error-exclamation.png'),
-              height: 150,
-              width: 150
-            ),
-            SizedBox(height: 30),
-            Text(
-              'Se ha producido un error',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25,
-                fontFamily: 'GilroyBold',
-              )
-            ),
-            SizedBox(height: 15),
-            Text(
-              'Se produjo un error al cargar la información, por favor, pulse el botón para volver a intentarlo.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16
-              )
-            ),
-            SizedBox(height: 30),
-            MaterialButton(
-              onPressed: () => _loadData(),
-              padding: EdgeInsets.only(
-                top: 10,
-                right: 18,
-                bottom: 10,
-                left: 12
-              ),
-              color: Theme.of(context).primaryColor,
-              elevation: 0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.refresh,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    'Reintentar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontFamily: 'GilroyBold'
-                    )
-                  )
-                ]
-              ),
-            )
-          ]
         )
       )
     );
@@ -294,11 +265,83 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
 
   Future<void> eliminarContacto(UserData contacto) async {
     startLoading();
-    UsersService.deleteContact(_currentUser, contacto)
+    UsersService.deleteContact(_currentUser.id, contacto.id)
       .then((val) {
         SnackbarService.showInfoSnackbar(
           key: _scaffoldKey,
           content: 'Usuario eliminado correctamente.'
+        );
+      })
+      .catchError((error) {
+        SnackbarService.showErrorSnackbar(
+          key: _scaffoldKey,
+          content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
+        );
+      })
+      .whenComplete(() => stopLoading());
+  }
+
+  Future<void> aceptarPeticion(UserData contacto) async {
+    startLoading();
+    UsersService.acceptRequest(_currentUser.id, contacto.id)
+      .then((val) {
+        SnackbarService.showInfoSnackbar(
+          key: _scaffoldKey,
+          content: 'Petición aceptada correctamente.'
+        );
+      })
+      .catchError((error) {
+        SnackbarService.showErrorSnackbar(
+          key: _scaffoldKey,
+          content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
+        );
+      })
+      .whenComplete(() => stopLoading());
+  }
+
+  Future<void> rechazarPeticion(UserData contacto) async {
+    startLoading();
+    UsersService.denyRequest(_currentUser.id, contacto.id)
+      .then((val) {
+        SnackbarService.showInfoSnackbar(
+          key: _scaffoldKey,
+          content: 'Petición rechazada correctamente.'
+        );
+      })
+      .catchError((error) {
+        SnackbarService.showErrorSnackbar(
+          key: _scaffoldKey,
+          content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
+        );
+      })
+      .whenComplete(() => stopLoading());
+  }
+
+  Future<void> bloquearContacto(UserData contacto) async {
+    startLoading();
+    UsersService.blockUser(_currentUser.id, contacto.id)
+      .then((val) {
+        SnackbarService.showInfoSnackbar(
+          key: _scaffoldKey,
+          content: 'Usuario bloqueado correctamente.'
+        );
+      })
+      .catchError((error) {
+        SnackbarService.showErrorSnackbar(
+          key: _scaffoldKey,
+          content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
+        );
+      })
+      .whenComplete(() => stopLoading());
+  }
+
+  Future<void> desbloquearContacto(UserData contacto) async {
+    startLoading();
+    UsersService.unlockUser(_currentUser.id, contacto.id)
+      .then((val) {
+        SnackbarService.showInfoSnackbar(
+          key: _scaffoldKey,
+          content: 'Usuario desbloqueado correctamente.'
         );
       })
       .catchError((error) {

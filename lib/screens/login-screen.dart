@@ -22,6 +22,9 @@ class _LoginScreenState extends State<LoginScreen> with Loadable {
   String _name, _password;
 
   @override
+  Future<void> loadData() async {}
+
+  @override
   String getLoadingTitle() {
     return 'Autenticando';
   }

@@ -35,14 +35,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
   _HomeScreenState(this.currentIndex);
 
-  _loadUser() {
+  @override
+  Future<void> loadData() async {
     startLoading();
     setState(() => loadError = false);
 
-    UsersService.getUserLocal()
-      .then((user) => setState(() => _currentUser = user))
-      .catchError((error) => setState(() => loadError = true))
-      .whenComplete(() => stopLoading());
+    try {
+      UserData user = await UsersService.getUserLocal();
+      setState(() => _currentUser = user);
+
+    } catch(e,  stackTrace) {
+      setState(() => loadError = true);
+      print('Error cargando los mensajes del usuario: ' + e.toString());
+      print(stackTrace.toString());
+    } finally {
+      stopLoading();
+    }
   }
 
   @override
@@ -53,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       vsync: this,
     )..addListener(() => setState(() {}));
 
-    _loadUser();
+    loadData();
   }
 
   @override
@@ -74,11 +82,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
       child: IndexedStack(
         index: currentIndex,
         children: homeNavigations.map<Widget>((Navigation navigation) {
-          return loading
-                  ? Container()
-                  : loadError
-                    ? getLoadErrorBody()
-                    : NavigationView(navigation: navigation);
+          return loadError
+                  ? getLoadErrorBody()
+                  : NavigationView(navigation: navigation);
         }).toList()
       )
     );
@@ -108,71 +114,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
               title: Text(navigation.title)
             );
           }).toList()
-        )
-      )
-    );
-  }
-
-  Widget getLoadErrorBody() {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(
-              image: AssetImage('assets/images/error/error-exclamation.png'),
-              height: 150,
-              width: 150
-            ),
-            SizedBox(height: 30),
-            Text(
-              'Se ha producido un error',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25,
-                fontFamily: 'GilroyBold',
-              )
-            ),
-            SizedBox(height: 15),
-            Text(
-              'Se produjo un error al cargar la información, por favor, pulse el botón para volver a intentarlo.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16
-              )
-            ),
-            SizedBox(height: 30),
-            MaterialButton(
-              onPressed: () => _loadUser(),
-              padding: EdgeInsets.only(
-                top: 10,
-                right: 18,
-                bottom: 10,
-                left: 12
-              ),
-              color: Theme.of(context).primaryColor,
-              elevation: 0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.refresh,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    'Reintentar',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontFamily: 'GilroyBold'
-                    )
-                  )
-                ]
-              ),
-            )
-          ]
         )
       )
     );

@@ -1,11 +1,11 @@
-import 'package:chatto/models/auth-model.dart';
-import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 abstract class LoadableWidget {
   Widget getWidgetBody();
 
   String getLoadingTitle();
+
+  Future<void> loadData();
 }
 
 
@@ -92,6 +92,71 @@ mixin Loadable<T extends StatefulWidget> on State<T> implements LoadableWidget {
             )
           )
         ]
+      )
+    );
+  }
+
+  Widget getLoadErrorBody() {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(
+              image: AssetImage('assets/images/error/error-exclamation.png'),
+              height: 150,
+              width: 150
+            ),
+            SizedBox(height: 30),
+            Text(
+              'Se ha producido un error',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 25,
+                fontFamily: 'GilroyBold',
+              )
+            ),
+            SizedBox(height: 15),
+            Text(
+              'Se produjo un error al cargar la información, por favor, pulse el botón para volver a intentarlo.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16
+              )
+            ),
+            SizedBox(height: 30),
+            MaterialButton(
+              onPressed: () => loadData(),
+              padding: EdgeInsets.only(
+                top: 10,
+                right: 18,
+                bottom: 10,
+                left: 12
+              ),
+              color: Theme.of(context).primaryColor,
+              elevation: 0,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.refresh,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 5),
+                  Text(
+                    'Reintentar',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontFamily: 'GilroyBold'
+                    )
+                  )
+                ]
+              ),
+            )
+          ]
+        )
       )
     );
   }

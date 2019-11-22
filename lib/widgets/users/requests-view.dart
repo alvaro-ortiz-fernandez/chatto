@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:chatto/models/auth-model.dart';
+import 'package:chatto/models/event-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
@@ -11,6 +14,7 @@ class RequestsView extends StatefulWidget {
 
 class RequestsViewState extends State<RequestsView> {
 
+  StreamSubscription requestsChangedSubscription;
   List<UserData> requests = List<UserData>();
 
   @override
@@ -19,6 +23,20 @@ class RequestsViewState extends State<RequestsView> {
     setState(() {
       requests = UsersScreen.of(context).requests;
     });
+
+    requestsChangedSubscription = eventBus
+      .on<RequestsChangedEvent>()
+      .listen((RequestsChangedEvent event) {
+        setState(() => requests = event.currentRequests);
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (requestsChangedSubscription != null)
+      requestsChangedSubscription.cancel();
   }
 
   @override
@@ -98,14 +116,26 @@ class RequestsViewState extends State<RequestsView> {
                                       iconSize: 28.0,
                                       color: Theme.of(context).primaryColor,
                                       tooltip: 'Aceptar',
-                                      onPressed: () => mostrarAlertaAceptacion(user.name)
+                                      onPressed: () {
+                                        mostrarAlertaAceptacion(user.name)
+                                          .then((decision) {
+                                            if (decision == true)
+                                              UsersScreen.of(context).aceptarPeticion(user);
+                                          });
+                                      }
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.close),
                                       iconSize: 28.0,
                                       color: Colors.red,
                                       tooltip: 'Rechazar',
-                                      onPressed: () => mostrarAlertaDenegacion(user.name)
+                                      onPressed: () {
+                                        mostrarAlertaDenegacion(user.name)
+                                          .then((decision) {
+                                            if (decision == true)
+                                              UsersScreen.of(context).rechazarPeticion(user);
+                                          });
+                                      }
                                     )
                                   ],
                                 )

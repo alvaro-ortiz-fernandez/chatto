@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:chatto/models/event-model.dart';
 import 'package:chatto/models/settings-model.dart';
 import 'package:chatto/screens/settings-screen.dart';
 import 'package:chatto/services/settings-service.dart';
@@ -10,15 +13,29 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
 
-  List<SettingGroup> settings = SettingsService.settings;
+  StreamSubscription settingsChangedSubscription;
+  List<SettingGroup> settings = List<SettingGroup>();
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      settings = SettingsScreen.of(context).settings;
+    });
 
-    SettingsScreen.of(context).loadSharedPreferences()
-      .then((val) => setState(() => settings = SettingsService.settings))
-      .catchError((error) {});
+    settingsChangedSubscription = eventBus
+      .on<SettingsChangedEvent>()
+      .listen((SettingsChangedEvent event) {
+        setState(() => settings = event.settings);
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (settingsChangedSubscription != null)
+      settingsChangedSubscription.cancel();
   }
 
   @override
@@ -51,7 +68,7 @@ class _SettingsViewState extends State<SettingsView> {
                           itemCount: settingGroup.settings.length,
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
-                            final Setting setting = settingGroup.settings[index];
+                            final UserSetting setting = settingGroup.settings[index];
                             return SwitchListTile(
                               contentPadding: EdgeInsets.all(0),
                               value: setting.enabled,
@@ -62,7 +79,7 @@ class _SettingsViewState extends State<SettingsView> {
                                     .catchError((error) {});
                                 }),
                               title: Text(
-                                setting.title,
+                                SettingsService.getSettingTitle(setting.key),
                                 style: TextStyle(
                                   color: Colors.black
                                 )

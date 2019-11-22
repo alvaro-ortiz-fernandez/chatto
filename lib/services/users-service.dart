@@ -47,21 +47,27 @@ class UsersService {
   /// ------------------------------------------------------------
   static Future<List<UserData>> getUserContacts(UserData user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<UserData> contacts;
 
     // Obtenemos los contactos del almacenamiento local. Si no existen, lo buscamos en
     // FireBase y los guardamos en local para el próximo acceso
     List<String> contactsJson = prefs.getStringList(_contactsPrefsKey + user.id);
     if (contactsJson != null) {
       // Mapeamos cada contacto a nuestro objeto a partir de la cadena JSON almacenada
-      List<UserData> contacts = contactsJson
+      contacts = contactsJson
         .map((contact) => UserData.fromJson(contact))
         .toList();
-      return contacts;
     } else {
-      List<UserData> contacts = await _getContacts(user);
+      contacts = await _getContacts(user);
       await _storeContacts(user, contacts);
-      return contacts;
     }
+
+    // Filtramos los contactos para no mostrar los que estén bloqueados
+    contacts = contacts
+      .where((contact) => !user.blocks.contains(contact.id))
+      .toList();
+
+    return contacts;
   }
 
   /// ------------------------------------------------------------
@@ -112,21 +118,22 @@ class UsersService {
   /// ------------------------------------------------------------
   /// Método que elimina un usuario de la lista de contactos
   /// ------------------------------------------------------------
-  static Future<void> deleteContact(UserData currentUser, UserData contact) async {
+  static Future<void> deleteContact(String currentUserId, String contactId) async {
     // Eliminamos en FireBase el contacto
     await _firestore
       .collection('/users')
-      .document(contact.id)
+      .document(currentUserId)
       .updateData(<String, dynamic>{
-        'contacts': FieldValue.arrayRemove([contact.id])
+        'contacts': FieldValue.arrayRemove([contactId])
       });
 
-    // Reseteamos los contactos en almacenamiento local
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_contactsPrefsKey);
+    // Reseteamos los contactos y el usuario en almacenamiento local
+    await deleteUserLocal();
 
     // Volvemos a obtener los contactos refrescamos y lanzamos un evento
     // para avisar que se han actualizado los contactos
+    UserData currentUser = await getUserLocal();
+
     List<UserData> contacts = await getUserContacts(currentUser);
     eventBus.fire(ContactsChangedEvent(contacts));
   }
@@ -135,25 +142,115 @@ class UsersService {
   /// ------------------------------------------------------------
   /// Método que acepta una petición de amistad
   /// ------------------------------------------------------------
-  static Future<void> acceptRequest() {}
+  static Future<void> acceptRequest(String currentUserId, String contactId) async {
+    DocumentReference currentUserRef = _firestore
+      .collection('/users')
+      .document(currentUserId);
+
+    // Usamos una transacción para asegurarnos de que sólo se aplican los cambios si ninguno falla
+    await _firestore.runTransaction((Transaction tx) async {
+      // Añadimos en Firebase al nuevo contacto
+      await tx.update(currentUserRef, <String, dynamic>{
+        'contacts': FieldValue.arrayUnion([contactId])
+      });
+
+      // Petición aceptada, la quitamos en Firebase de peticiones pendientes de aceptar/rechazar
+      await tx.update(currentUserRef, <String, dynamic>{
+        'requests': FieldValue.arrayRemove([contactId])
+      });
+    });
+
+    // Reseteamos las peticiones de amistad y el usuario en almacenamiento local
+    await deleteUserLocal();
+
+    // Volvemos a obtener las las peticiones de amistad, refrescamos
+    // y lanzamos un evento para avisar que se han actualizado ambos
+    UserData currentUser = await getUserLocal();
+
+    List<UserData> contacts = await getUserContacts(currentUser);
+    eventBus.fire(ContactsChangedEvent(contacts));
+
+    List<UserData> requests = await getUserRequests(currentUser);
+    eventBus.fire(RequestsChangedEvent(requests));
+  }
 
 
   /// ------------------------------------------------------------
   /// Método que rechaza una petición de amistad
   /// ------------------------------------------------------------
-  static Future<void> denyRequest() {}
+  static Future<void> denyRequest(String currentUserId, String contactId) async {
+    // Eliminamos en firebase la petición de amistad
+    await _firestore
+      .collection('/users')
+      .document(currentUserId)
+      .updateData(<String, dynamic>{
+        'requests': FieldValue.arrayRemove([contactId])
+      });
+
+    // Reseteamos las peticiones de amistad y el usuario en almacenamiento local
+    await deleteUserLocal();
+
+    // Volvemos a obtener las las peticiones de amistad, refrescamos
+    // y lanzamos un evento para avisar que se han actualizado ambos
+    UserData currentUser = await getUserLocal();
+
+    List<UserData> requests = await getUserRequests(currentUser);
+    eventBus.fire(RequestsChangedEvent(requests));
+  }
 
 
   /// ------------------------------------------------------------
   /// Método que bloquea a un usuario
   /// ------------------------------------------------------------
-  static Future<void> blockUser() {}
+  static Future<void> blockUser(String currentUserId, String contactId) async {
+    // Añadimos en FireBase el contacto a la lista de bloqueados
+    await _firestore
+      .collection('/users')
+      .document(currentUserId)
+      .updateData(<String, dynamic>{
+        'blocks': FieldValue.arrayUnion([contactId])
+      });
+
+    // Reseteamos los usuarios bloqueados, contactos y el usuario en almacenamiento local
+    await deleteUserLocal();
+
+    // Volvemos a obtener los contactos y los usuarios bloqueados, refrescamos
+    // y lanzamos un evento para avisar que se han actualizado ambos
+    UserData currentUser = await getUserLocal();
+
+    List<UserData> contacts = await getUserContacts(currentUser);
+    eventBus.fire(ContactsChangedEvent(contacts));
+
+    List<UserData> blocks = await getUserBlocks(currentUser);
+    eventBus.fire(BlocksChangedEvent(blocks));
+  }
 
 
   /// ------------------------------------------------------------
   /// Método que desbloquea a un usuario
   /// ------------------------------------------------------------
-  static Future<void> unblockUser() {}
+  static Future<void> unlockUser(String currentUserId, String contactId) async {
+    // Eliminamos en FireBase el contacto de la lista de bloqueados
+    await _firestore
+      .collection('/users')
+      .document(currentUserId)
+      .updateData(<String, dynamic>{
+        'blocks': FieldValue.arrayRemove([contactId])
+      });
+
+    // Reseteamos los usuarios bloqueados, contactos y el usuario en almacenamiento local
+    await deleteUserLocal();
+
+    // Volvemos a obtener los contactos y los usuarios bloqueados, refrescamos
+    // y lanzamos un evento para avisar que se han actualizado ambos
+    UserData currentUser = await getUserLocal();
+
+    List<UserData> contacts = await getUserContacts(currentUser);
+    eventBus.fire(ContactsChangedEvent(contacts));
+
+    List<UserData> blocks = await getUserBlocks(currentUser);
+    eventBus.fire(BlocksChangedEvent(blocks));
+  }
 
 
   /// ------------------------------------------------------------

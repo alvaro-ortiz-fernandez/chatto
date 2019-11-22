@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:chatto/models/auth-model.dart';
+import 'package:chatto/models/event-model.dart';
 import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
-import 'package:chatto/services/snackbar-service.dart';
-import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 class ContactsView extends StatefulWidget {
@@ -18,6 +19,7 @@ class ContactsView extends StatefulWidget {
 
 class ContactsViewState extends State<ContactsView> {
 
+  StreamSubscription contactsChangedSubscription;
   List<UserData> contacts = List<UserData>();
 
   @override
@@ -26,6 +28,20 @@ class ContactsViewState extends State<ContactsView> {
     setState(() {
       contacts = UsersScreen.of(context).contacts;
     });
+
+    contactsChangedSubscription = eventBus
+      .on<ContactsChangedEvent>()
+      .listen((ContactsChangedEvent event) {
+        setState(() => contacts = event.currentContacts);
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (contactsChangedSubscription != null)
+      contactsChangedSubscription.cancel();
   }
 
   @override
@@ -120,7 +136,13 @@ class ContactsViewState extends State<ContactsView> {
                                       iconSize: 28.0,
                                       color: Colors.black54,
                                       tooltip: 'Bloquear',
-                                      onPressed: () => mostrarAlertaBloqueo(user.name)
+                                      onPressed: () {
+                                        mostrarAlertaBloqueo(user.name)
+                                          .then((decision) {
+                                            if (decision == true)
+                                              UsersScreen.of(context).bloquearContacto(user);
+                                        });
+                                      }
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.delete),

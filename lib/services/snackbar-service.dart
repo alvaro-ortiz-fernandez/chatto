@@ -35,7 +35,7 @@ class SnackbarService {
       backgroundColor: backgroundColor,
       behavior: SnackBarBehavior.floating,
       elevation: 3,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 4),
       content: content,
       action: SnackBarAction(
         label: 'OK',

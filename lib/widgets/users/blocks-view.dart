@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:chatto/models/auth-model.dart';
+import 'package:chatto/models/event-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
@@ -12,6 +15,7 @@ class BlocksView extends StatefulWidget {
 
 class BlocksViewState extends State<BlocksView> {
 
+  StreamSubscription blocksChangedSubscription;
   List<UserData> blocks = List<UserData>();
 
   @override
@@ -20,6 +24,20 @@ class BlocksViewState extends State<BlocksView> {
     setState(() {
       blocks = UsersScreen.of(context).blocks;
     });
+
+    blocksChangedSubscription = eventBus
+      .on<BlocksChangedEvent>()
+      .listen((BlocksChangedEvent event) {
+        setState(() => blocks = event.currentBlocks);
+      });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (blocksChangedSubscription != null)
+      blocksChangedSubscription.cancel();
   }
 
   @override
@@ -99,7 +117,13 @@ class BlocksViewState extends State<BlocksView> {
                                       iconSize: 28.0,
                                       color: Colors.black54,
                                       tooltip: 'Desbloquear',
-                                      onPressed: () => mostrarAlertaDesbloqueo(user.name)
+                                      onPressed: () {
+                                        mostrarAlertaDesbloqueo(user.name)
+                                          .then((decision) {
+                                          if (decision == true)
+                                            UsersScreen.of(context).desbloquearContacto(user);
+                                        });
+                                      }
                                     )
                                   ],
                                 )
