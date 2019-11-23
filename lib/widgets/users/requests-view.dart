@@ -5,9 +5,14 @@ import 'package:chatto/models/event-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 class RequestsView extends StatefulWidget {
+  final UserData currentUser;
+
+  RequestsView({ this.currentUser });
+
   @override
   RequestsViewState createState() => new RequestsViewState();
 }
@@ -63,6 +68,7 @@ class RequestsViewState extends State<RequestsView> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ProfileScreen(
+                            currentUser: widget.currentUser,
                             user: user
                           )
                         )
@@ -77,7 +83,11 @@ class RequestsViewState extends State<RequestsView> {
                               children: <Widget>[
                                 CircleAvatar(
                                   radius: 30.0,
-                                  backgroundImage: AssetImage(user.imageUrl),
+                                  backgroundImage: AssetImage(
+                                    user.imageUrl != null && user.imageUrl.isNotEmpty
+                                      ? user.imageUrl
+                                      : UsersService.defaultAvatarPath
+                                  ),
                                 ),
                                 SizedBox(width: 15.0),
                                 Column(

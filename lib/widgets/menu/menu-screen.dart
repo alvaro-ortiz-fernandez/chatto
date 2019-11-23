@@ -4,6 +4,7 @@ import 'package:chatto/screens/home-screen.dart';
 import 'package:chatto/screens/settings-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/auth-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:chatto/widgets/menu/circular-image.dart';
 import 'package:chatto/widgets/menu/zoom-scaffold.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,11 @@ class MenuScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: CircularImage(
-                    AssetImage(currentUser.imageUrl),
+                    AssetImage(
+                      currentUser.imageUrl != null && currentUser.imageUrl.isNotEmpty
+                        ? currentUser.imageUrl
+                        : UsersService.defaultAvatarPath
+                    ),
                   ),
                 ),
                 Text(

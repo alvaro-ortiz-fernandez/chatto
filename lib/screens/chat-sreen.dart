@@ -2,6 +2,7 @@ import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/services/snackbar-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:chatto/widgets/chat/chat-message.dart';
 import 'package:chatto/widgets/ui/loadable.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +153,7 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
               context,
               MaterialPageRoute(
                 builder: (_) => ProfileScreen(
+                  currentUser: widget.currentUser,
                   user: widget.talkingUser
                 )
               )
@@ -160,7 +162,11 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
               padding: EdgeInsets.all(8),
               child: CircleAvatar(
                 radius: 20.0,
-                backgroundImage: AssetImage(widget.talkingUser.imageUrl),
+                backgroundImage: AssetImage(
+                  widget.talkingUser.imageUrl != null && widget.talkingUser.imageUrl.isNotEmpty
+                    ? widget.talkingUser.imageUrl
+                    : UsersService.defaultAvatarPath
+                ),
               )
             )
           )
@@ -220,7 +226,7 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
             FlatButton(
               highlightColor: Colors.blue[50],
               child: Text(
-                'AGREGAR',
+                'PROGRAMAR',
                 style: TextStyle(
                   color: Theme.of(context).primaryColor,
                   fontFamily: 'GilroyBold'
@@ -235,7 +241,7 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
                     .then((val) {
                       SnackbarService.showInfoSnackbar(
                         key: _scaffoldKey,
-                        content: 'Usuario agregado correctamente.'
+                        content: 'Mensaje programado correctamente.'
                       );
                     })
                     .catchError((error) {

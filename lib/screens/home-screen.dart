@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
   @override
   String getLoadingTitle() {
-    return 'Cargando información';
+    return 'Actualizando información';
   }
 
   @override

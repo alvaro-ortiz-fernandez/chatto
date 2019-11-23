@@ -84,6 +84,7 @@ class RegisterAttemp {
     switch (resultCode) {
       case 'ERROR_INVALID_EMAIL':        return 'Formato del email inválido.';
       case 'ERROR_EMAIL_ALREADY_IN_USE': return 'El email introducido ya está en uso.';
+      case 'ERROR_USUARIO_EN_USO':       return 'El nombre de usuario introducido ya está en uso.';
       case 'ERROR_WEAK_PASSWORD':        return 'La contraseña introducida no es segura.';
       default:                           return 'Se ha producido un error, por favor, inténtelo de nuevo.';
     }
@@ -112,7 +113,7 @@ class LoginAttemp {
 }
 
 final UserData greg = UserData(
-  id: '1',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'Greg',
   email: 'test@mail.com',
   imageUrl: 'assets/images/greg.jpg',
@@ -122,7 +123,7 @@ final UserData greg = UserData(
 );
 
 final UserData james = UserData(
-  id: '2',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'James',
   email: 'test@mail.com',
   imageUrl: 'assets/images/james.jpg',
@@ -132,7 +133,7 @@ final UserData james = UserData(
 );
 
 final UserData john = UserData(
-  id: '3',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'John',
   email: 'test@mail.com',
   imageUrl: 'assets/images/john.jpg',
@@ -142,7 +143,7 @@ final UserData john = UserData(
 );
 
 final UserData olivia = UserData(
-  id: '4',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'Olivia',
   email: 'test@mail.com',
   imageUrl: 'assets/images/olivia.jpg',
@@ -152,7 +153,7 @@ final UserData olivia = UserData(
 );
 
 final UserData sam = UserData(
-  id: '5',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'Sam',
   email: 'test@mail.com',
   imageUrl: 'assets/images/sam.jpg',
@@ -162,7 +163,7 @@ final UserData sam = UserData(
 );
 
 final UserData sophia = UserData(
-  id: '6',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'Sophia',
   email: 'test@mail.com',
   imageUrl: 'assets/images/sophia.jpg',
@@ -172,7 +173,7 @@ final UserData sophia = UserData(
 );
 
 final UserData steven = UserData(
-  id: '7',
+  id: '3z73tMZnBaxfc8qPG37x',
   name: 'Steven',
   email: 'test@mail.com',
   imageUrl: 'assets/images/steven.jpg',

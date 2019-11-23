@@ -47,7 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen> with TickerProviderStat
 
     } catch(e,  stackTrace) {
       setState(() => loadError = true);
-      print('Error cargando los mensajes del usuario: ' + e.toString());
+      print('Error cargando las preferencias del usuario: ' + e.toString());
       print(stackTrace.toString());
     } finally {
       stopLoading();

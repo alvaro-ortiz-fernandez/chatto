@@ -5,10 +5,15 @@ import 'package:chatto/models/event-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 
 class BlocksView extends StatefulWidget {
+  final UserData currentUser;
+
+  BlocksView({ this.currentUser });
+
   @override
   BlocksViewState createState() => new BlocksViewState();
 }
@@ -64,6 +69,7 @@ class BlocksViewState extends State<BlocksView> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ProfileScreen(
+                            currentUser: widget.currentUser,
                             user: user
                           )
                         )
@@ -78,7 +84,11 @@ class BlocksViewState extends State<BlocksView> {
                               children: <Widget>[
                                 CircleAvatar(
                                   radius: 30.0,
-                                  backgroundImage: AssetImage(user.imageUrl),
+                                  backgroundImage: AssetImage(
+                                    user.imageUrl != null && user.imageUrl.isNotEmpty
+                                      ? user.imageUrl
+                                      : UsersService.defaultAvatarPath
+                                  ),
                                 ),
                                 SizedBox(width: 15.0),
                                 Column(

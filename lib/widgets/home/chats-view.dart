@@ -1,5 +1,6 @@
 import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:flutter/material.dart';
@@ -57,13 +58,18 @@ class ChatsView extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => ProfileScreen(
+                                        currentUser: currentUser,
                                         user: chat.sender
                                       )
                                     )
                                   ),
                                   child: CircleAvatar(
                                     radius: 30.0,
-                                    backgroundImage: AssetImage(chat.sender.imageUrl),
+                                    backgroundImage: AssetImage(
+                                      chat.sender.imageUrl != null && chat.sender.imageUrl.isNotEmpty
+                                        ? chat.sender.imageUrl
+                                        : UsersService.defaultAvatarPath
+                                    ),
                                   )
                                 ),
                                 SizedBox(width: 15.0),

@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:optional/optional.dart';
 
 class AuthService {
   static final _auth = FirebaseAuth.instance;
@@ -32,12 +33,17 @@ class AuthService {
   /// ------------------------------------------------------------
   /// Método que autentica al usuario en la aplicación
   /// ------------------------------------------------------------
-  static Future<LoginAttemp> login(String email, String password) async {
+  static Future<LoginAttemp> login(String name, String password) async {
     try {
+      // Obtenemos el email del usuario
+      Optional<UserData> optFoundUser = await UsersService.getUserByName(name);
+      if (!optFoundUser.isPresent)
+        return LoginAttemp(isError: true, resultCode: 'ERROR_USER_NOT_FOUND');
+
       // Mandamos la petición de login a FireBase
       AuthResult authResult = await _auth
         .signInWithEmailAndPassword(
-          email: email,
+          email: optFoundUser.value.email,
           password: password
         );
 
@@ -47,8 +53,12 @@ class AuthService {
 
       // Usuario obtenido correctamente, devolvemos respuesta
       return LoginAttemp(isError: false);
-    } catch(e) {
+    } on PlatformException catch (e) {
+      return LoginAttemp(isError: true, resultCode: e.code);
+    } catch (e,  stackTrace) {
       // Error de firestore al obtener el usuario
+      print('Error al iniciar sesión: ' + e.toString());
+      print(stackTrace.toString());
       return LoginAttemp(isError: true, resultCode: e.toString());
     }
   }
@@ -76,6 +86,11 @@ class AuthService {
   /// ------------------------------------------------------------
   static Future<RegisterAttemp> signup(String name, String email, String password) async {
     try {
+      // Comprobamos si el nombre de usuario ya está en uso
+      Optional<UserData> optFoundUser = await UsersService.getUserByName(name);
+      if (optFoundUser.isPresent)
+        return RegisterAttemp(isError: true, resultCode: 'ERROR_USUARIO_EN_USO');
+
       // Creamos una cuenta en FireBase
       AuthResult authResult = await _auth
         .createUserWithEmailAndPassword(

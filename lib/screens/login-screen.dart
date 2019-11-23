@@ -25,6 +25,12 @@ class _LoginScreenState extends State<LoginScreen> with Loadable {
   Future<void> loadData() async {}
 
   @override
+  void initState() {
+    super.initState();
+    loading = false;
+  }
+
+  @override
   String getLoadingTitle() {
     return 'Autenticando';
   }
@@ -183,14 +189,14 @@ class _LoginScreenState extends State<LoginScreen> with Loadable {
                                               AuthService
                                                 .login(_name, _password)
                                                 .then((LoginAttemp attemp) {
-                                                  stopLoading();
                                                   if (attemp.isError) {
                                                     SnackbarService.showErrorSnackbar(key: _scaffoldKey,
                                                       content: attemp.getErrorMessage());
                                                   } else {
                                                     Navigator.pushNamed(context, HomeScreen.id);
                                                   }
-                                                });
+                                                })
+                                                .whenComplete(() => stopLoading());
                                             }
                                           },
                                           child: Text(

@@ -5,6 +5,7 @@ import 'package:chatto/models/event-model.dart';
 import 'package:chatto/services/auth-service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:optional/optional.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UsersService {
@@ -14,6 +15,8 @@ class UsersService {
   static final String _contactsPrefsKey = 'chatto-contacts-';
   static final String _requestsPrefsKey = 'chatto-requests-';
   static final String _blocksPrefsKey   = 'chatto-blocks-';
+
+  static final String defaultAvatarPath = 'assets/images/user/default-avatar.png';
 
   /// ------------------------------------------------------------
   /// Método que extrae del almacenamiento local la información del usuario
@@ -114,6 +117,26 @@ class UsersService {
     }
   }
 
+  /// ------------------------------------------------------------
+  /// Método que obtiene un usuario por su numbre
+  /// ------------------------------------------------------------
+  static Future<Optional<UserData>> getUserByName(String contactName) async {
+    // Buscamos al usuario en firebase
+    QuerySnapshot data = await _firestore
+      .collection('/users')
+      .where('name', isEqualTo: contactName)
+      .snapshots()
+      .first;
+
+    if (data.documents != null && data.documents.isNotEmpty) {
+      // Lo mapeamos a nuestra clase y lo devolvemos
+      UserData user = UserData.fromDocument(data.documents[0]);
+      return Optional.of(user);
+    } else {
+      return Optional.ofNullable(null);
+    }
+  }
+
 
   /// ------------------------------------------------------------
   /// Método que elimina un usuario de la lista de contactos
@@ -138,11 +161,24 @@ class UsersService {
     eventBus.fire(ContactsChangedEvent(contacts));
   }
 
+  /// ------------------------------------------------------------
+  /// Método que envía una petición de amistad
+  /// ------------------------------------------------------------
+  static Future<void> sendRequest(String currentUserId, String contactId) async {
+    await _firestore
+      .collection('/users')
+      .document(contactId)
+      .updateData(<String, dynamic>{
+        'requests': FieldValue.arrayUnion([currentUserId])
+      });
+  }
+
 
   /// ------------------------------------------------------------
   /// Método que acepta una petición de amistad
   /// ------------------------------------------------------------
   static Future<void> acceptRequest(String currentUserId, String contactId) async {
+    // Obtenemos la referencia al documento en firebase de nuestro usuario
     DocumentReference currentUserRef = _firestore
       .collection('/users')
       .document(currentUserId);

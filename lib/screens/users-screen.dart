@@ -13,6 +13,7 @@ import 'package:chatto/widgets/users/blocks-view.dart';
 import 'package:chatto/widgets/users/contacts-view.dart';
 import 'package:chatto/widgets/users/requests-view.dart';
 import 'package:flutter/material.dart';
+import 'package:optional/optional.dart';
 import 'package:provider/provider.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -30,6 +31,7 @@ class UsersScreen extends StatefulWidget {
 class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin, Loadable {
 
   static UserData _currentUser = UserData.emptyUser();
+  String _name;
 
   StreamSubscription contactsChangedSubscription;
   StreamSubscription requestsChangedSubscription;
@@ -126,7 +128,7 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
 
   @override
   String getLoadingTitle() {
-    return 'Cargando información';
+    return 'Actualizando información';
   }
 
   @override
@@ -197,10 +199,11 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Introduce el nombre del usuario que quieres agregar.'),
+                Text('Introduzca el nombre del usuario que quiere agregar.'),
                 Form(
                   key: _formKey,
                   child: TextFormField(
+                    onSaved: (input) => _name = input,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Por favor, introduzca un valor';
@@ -239,21 +242,7 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
                 if (_formKey.currentState.validate()) {
                   startLoading();
                   Navigator.of(context).pop();
-
-                  Future.delayed(Duration(seconds: 2), () => throw Exception())
-                    .then((val) {
-                      SnackbarService.showInfoSnackbar(
-                        key: _scaffoldKey,
-                        content: 'Usuario agregado correctamente.'
-                      );
-                    })
-                    .catchError((error) {
-                      SnackbarService.showErrorSnackbar(
-                        key: _scaffoldKey,
-                        content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
-                      );
-                    })
-                    .whenComplete(() => stopLoading());
+                  agregarContacto();
                 }
               }
             )
@@ -261,6 +250,31 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
         );
       }
     );
+  }
+
+  Future<void> agregarContacto() async {
+    try {
+      Optional<UserData> optFoundUser = await UsersService.getUserByName(_name);
+      if (!optFoundUser.isPresent) {
+        SnackbarService.showErrorSnackbar(
+          key: _scaffoldKey,
+          content: 'El usuario introducido no existe'
+        );
+      } else {
+        await UsersService.sendRequest(_currentUser.id, _name);
+        SnackbarService.showInfoSnackbar(
+          key: _scaffoldKey,
+          content: 'Petición de amistad enviada correctamente.'
+        );
+      }
+    } catch (e) {
+      SnackbarService.showErrorSnackbar(
+        key: _scaffoldKey,
+        content: 'Se ha producido un error, por favor, inténtelo de nuevo.'
+      );
+    } finally {
+      stopLoading();
+    }
   }
 
   Future<void> eliminarContacto(UserData contacto) async {

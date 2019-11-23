@@ -56,6 +56,7 @@ class SettingsService {
 
       for (final SettingModel settingModel in settingGroup.settings) {
         UserSetting userSetting = UserSetting(
+          userId: userId,
           key: settingModel.key,
           enabled: await getSetting(userId, settingModel.key)
         );
@@ -132,7 +133,8 @@ class SettingsService {
     // Obtenemos la preferencia de FireBase
     QuerySnapshot data = await _firestore
       .collection('/settings')
-      .where('userId', isEqualTo: userId)
+        .where('userId', isEqualTo: userId)
+        .where('key', isEqualTo: key)
       .snapshots()
       .first;
 
@@ -174,7 +176,8 @@ class SettingsService {
     // Buscamos la preferencia en firebase
     QuerySnapshot data = await _firestore
       .collection('/settings')
-      .where('userId', isEqualTo: userId)
+        .where('userId', isEqualTo: userId)
+        .where('key', isEqualTo: key)
       .snapshots()
       .first;
 
@@ -225,6 +228,6 @@ class SettingsService {
   /// Método que construye el id de una preferencia en el almacenamiento local
   /// ------------------------------------------------------------
   static String _buildSettingPrefKey(String userId, String key) {
-    return 'chatto-setting-' + userId + '-' + key;
+    return ('chatto-setting-' + userId + '-' + key);
   }
 }

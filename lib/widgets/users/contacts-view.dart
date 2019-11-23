@@ -6,6 +6,7 @@ import 'package:chatto/screens/chat-sreen.dart';
 import 'package:chatto/screens/profile-screen.dart';
 import 'package:chatto/screens/users-screen.dart';
 import 'package:chatto/services/dialog-service.dart';
+import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 
 class ContactsView extends StatefulWidget {
@@ -68,6 +69,7 @@ class ContactsViewState extends State<ContactsView> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => ProfileScreen(
+                            currentUser: widget.currentUser,
                             user: user
                           )
                         )
@@ -82,7 +84,11 @@ class ContactsViewState extends State<ContactsView> {
                               children: <Widget>[
                                 CircleAvatar(
                                   radius: 30.0,
-                                  backgroundImage: AssetImage(user.imageUrl),
+                                  backgroundImage: AssetImage(
+                                    user.imageUrl != null && user.imageUrl.isNotEmpty
+                                      ? user.imageUrl
+                                      : UsersService.defaultAvatarPath
+                                  ),
                                 ),
                                 SizedBox(width: 15.0),
                                 Column(
