@@ -1,114 +1,37 @@
 import 'package:chatto/models/auth-model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Message {
-  final UserData sender;
-  final String time;
-  final String text;
-  final bool isLiked;
+  final String sender;
+  final String receiver;
+  final DateTime time;
+  final String content;
   final bool unread;
 
   Message({
     this.sender,
+    this.receiver,
     this.time,
-    this.text,
-    this.isLiked,
+    this.content,
     this.unread
   });
+
+  factory Message.fromDocument(DocumentSnapshot doc) {
+    Message message = Message(
+      sender: doc['sender'] ?? '',
+      receiver: doc['receiver'] ?? '',
+      time: doc['time'] != null ? doc['time'].toDate() : null,
+      content: doc['content'] ?? '',
+      unread: doc['unread'] ?? false
+    );
+    return message;
+  }
 }
 
-List<Message> chats = [
-  Message(
-    sender: james,
-    time: '5:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: false,
-  ),
-  Message(
-    sender: olivia,
-    time: '4:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: false,
-  ),
-  Message(
-    sender: john,
-    time: '3:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: sophia,
-    time: '2:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: steven,
-    time: '1:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: false,
-  ),
-  Message(
-    sender: sam,
-    time: '12:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: greg,
-    time: '11:30 AM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: false,
-    unread: false,
-  ),
-];
+class MessageView extends Message {
+  final UserData senderData;
+  final UserData receiverData;
 
-List<Message> messages = [
-  Message(
-    sender: james,
-    time: '5:30 PM',
-    text: 'Hey, how\'s it going? What did you do today?',
-    isLiked: true,
-    unread: true,
-  ),
-  Message(
-    sender: james,
-    time: '4:30 PM',
-    text: 'Just walked my doge. She was super duper cute. The best pupper!!',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: james,
-    time: '3:45 PM',
-    text: 'How\'s the doggo?',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: james,
-    time: '3:15 PM',
-    text: 'All the food',
-    isLiked: true,
-    unread: true,
-  ),
-  Message(
-    sender: james,
-    time: '2:30 PM',
-    text: 'Nice! What kind of food did you eat?',
-    isLiked: false,
-    unread: true,
-  ),
-  Message(
-    sender: james,
-    time: '2:00 PM',
-    text: 'I ate so much food today.',
-    isLiked: false,
-    unread: true,
-  ),
-];
+  MessageView(String sender, String receiver, DateTime time, String content, bool unread, this.senderData, this.receiverData)
+    : super(sender: sender, receiver: receiver, time: time, content: content, unread: unread);
+}

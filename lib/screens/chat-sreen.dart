@@ -1,6 +1,7 @@
 import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/screens/profile-screen.dart';
+import 'package:chatto/services/messages-service.dart';
 import 'package:chatto/services/snackbar-service.dart';
 import 'package:chatto/services/users-service.dart';
 import 'package:chatto/widgets/chat/chat-message.dart';
@@ -8,10 +9,9 @@ import 'package:chatto/widgets/ui/loadable.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  final UserData currentUser;
   final UserData talkingUser;
 
-  ChatScreen({ this.currentUser, this.talkingUser });
+  ChatScreen({ this.talkingUser });
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -22,13 +22,37 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scheduledMessageFormKey = GlobalKey<FormState>();
 
+  Stream<List<MessageView>> _messagesStream = Stream.empty();
+  UserData _currentUser;
+  bool loadError = false;
+
   @override
-  Future<void> loadData() async {}
+  Future<void> loadData() async {
+    startLoading();
+    setState(() => loadError = false);
+
+    try {
+      UserData user = await UsersService.getUserLocal();
+      setState(() => _currentUser = user);
+
+      Stream<List<MessageView>> stream = await MessagesService
+        .getConversation(_currentUser.id, widget.talkingUser.id);
+
+      setState(() => _messagesStream = stream);
+
+    } catch(e,  stackTrace) {
+      setState(() => loadError = true);
+      print('Error cargando los mensajes del usuario: ' + e.toString());
+      print(stackTrace.toString());
+    } finally {
+      stopLoading();
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    loading = false;
+    loadData();
   }
 
   @override
@@ -46,14 +70,22 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
             decoration: BoxDecoration(
               color: Theme.of(context).accentColor
             ),
-            child: ListView.builder(
-              padding: EdgeInsets.only(top: 15.0),
-              itemCount: messages.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Message message = messages[index];
-                bool isMe = message.sender.id == widget.currentUser.id;
-                return new ChatMessage(message: message, isMe: isMe);
-              },
+            child: StreamBuilder(
+              stream: _messagesStream,
+              builder: (BuildContext context, AsyncSnapshot<List<MessageView>> snapshot) {
+                if (!snapshot.hasData)
+                  return Container();
+
+                return ListView.builder(
+                  padding: EdgeInsets.only(top: 15.0),
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final MessageView message = snapshot.data[index];
+                    bool isMe = message.senderData.id == _currentUser.id;
+                    return ChatMessage(message: message, isMe: isMe);
+                  }
+                );
+              }
             )
           )
         ),
@@ -153,7 +185,7 @@ class _ChatScreenState extends State<ChatScreen> with Loadable {
               context,
               MaterialPageRoute(
                 builder: (_) => ProfileScreen(
-                  currentUser: widget.currentUser,
+                  currentUser: _currentUser,
                   user: widget.talkingUser
                 )
               )

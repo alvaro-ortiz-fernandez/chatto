@@ -160,8 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> with Loadable {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => ChatScreen(
-                                        currentUser: widget.currentUser,
-                                        talkingUser: widget.user,
+                                        talkingUser: widget.user
                                       )
                                     )
                                   );

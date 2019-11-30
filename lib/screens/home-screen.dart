@@ -1,5 +1,6 @@
 import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/navigation-model.dart';
+import 'package:chatto/services/messages-service.dart';
 import 'package:chatto/services/users-service.dart';
 import 'package:chatto/widgets/home/chats-view.dart';
 import 'package:chatto/widgets/home/groups-view.dart';
@@ -24,8 +25,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
 
   static UserData _currentUser = UserData.emptyUser();
   final List<Navigation> homeNavigations = <Navigation>[
-    Navigation(title: 'Chats', icon: Icons.chat_bubble, view: ChatsView(currentUser: _currentUser), parent: HomeScreen(currentIndex: 0)),
-    Navigation(title: 'Grupos', icon: Icons.supervisor_account, view: GroupsView(currentUser: _currentUser), parent: HomeScreen(currentIndex: 1))
+    Navigation(title: 'Chats', icon: Icons.chat_bubble, view: ChatsView(), parent: HomeScreen(currentIndex: 0)),
+    Navigation(title: 'Grupos', icon: Icons.supervisor_account, view: GroupsView(), parent: HomeScreen(currentIndex: 1))
   ];
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -43,6 +44,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
     try {
       UserData user = await UsersService.getUserLocal();
       setState(() => _currentUser = user);
+
+      await MessagesService.getUserMessages();
 
     } catch(e,  stackTrace) {
       setState(() => loadError = true);

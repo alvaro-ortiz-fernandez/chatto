@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ChatMessage extends StatelessWidget {
 
-  final Message message;
+  final MessageView message;
   final bool isMe;
 
   ChatMessage({ this.message, this.isMe });
@@ -25,7 +25,7 @@ class ChatMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            message.time,
+            message.time.toString(),
             style: TextStyle(
               color: isMe
                 ? Colors.white
@@ -36,7 +36,7 @@ class ChatMessage extends StatelessWidget {
           ),
           SizedBox(height: 8.0),
           Text(
-            message.text,
+            message.content,
             style: TextStyle(
               color: isMe
                 ? Colors.white

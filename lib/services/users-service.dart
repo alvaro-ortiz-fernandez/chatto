@@ -31,7 +31,7 @@ class UsersService {
     if (userJson != null) {
       return UserData.fromJson(userJson);
     } else {
-      UserData userData = await _getAccountData(firebaseUser.uid);
+      UserData userData = await getUserData(firebaseUser.uid);
       await _storeAccountData(userData, firebaseUser.uid);
       return userData;
     }
@@ -115,6 +115,22 @@ class UsersService {
       await _storeBlocks(user, blocks);
       return blocks;
     }
+  }
+
+
+  /// ------------------------------------------------------------
+  /// Método que trae de FireBase la información de un usuario
+  /// ------------------------------------------------------------
+  static Future<UserData> getUserData(String uid) async {
+    // Obtenemos la información del usuario en BBDD
+    DocumentSnapshot userDoc = await _firestore
+      .collection('/users')
+      .document(uid)
+      .get();
+
+    // Lo mapeamos a nuestra clase y lo devolvemos
+    UserData user = UserData.fromDocument(userDoc);
+    return user;
   }
 
   /// ------------------------------------------------------------
@@ -288,22 +304,6 @@ class UsersService {
     eventBus.fire(BlocksChangedEvent(blocks));
   }
 
-
-  /// ------------------------------------------------------------
-  /// Método que trae de FireBase la información del usuario
-  /// ------------------------------------------------------------
-  static Future<UserData> _getAccountData(String uid) async {
-    // Obtenemos la información del usuario en BBDD
-    DocumentSnapshot userDoc = await _firestore
-      .collection('/users')
-      .document(uid)
-      .get();
-
-    // Lo mapeamos a nuestra clase y lo devolvemos
-    UserData user = UserData.fromDocument(userDoc);
-    return user;
-  }
-
   /// ------------------------------------------------------------
   /// Método que guarda en almacenamiento local la información del usuario
   /// ------------------------------------------------------------
@@ -320,7 +320,7 @@ class UsersService {
 
     // Recorremos cada idContacto del usuario recibido por parámetro
     for (final String contactId in user.contacts) {
-      UserData contact = await _getAccountData(contactId);
+      UserData contact = await getUserData(contactId);
       contacts.add(contact);
     }
 
@@ -349,7 +349,7 @@ class UsersService {
 
     // Recorremos los idUsuario de cada petición de amistad del usuario recibido por parámetro
     for (final String requestId in user.requests) {
-      UserData request = await _getAccountData(requestId);
+      UserData request = await getUserData(requestId);
       requests.add(request);
     }
 
@@ -378,7 +378,7 @@ class UsersService {
 
     // Recorremos los idUsuario de cada usuario bloqueado por el recibido por parámetro
     for (final String blockId in user.blocks) {
-      UserData block = await _getAccountData(blockId);
+      UserData block = await getUserData(blockId);
       blocks.add(block);
     }
 

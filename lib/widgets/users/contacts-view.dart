@@ -131,8 +131,7 @@ class ContactsViewState extends State<ContactsView> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (_) => ChatScreen(
-                                            currentUser: widget.currentUser,
-                                            talkingUser: user,
+                                            talkingUser: user
                                           )
                                         )
                                       )
