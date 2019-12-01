@@ -119,7 +119,6 @@ class RequestsViewState extends State<RequestsView> {
                             Column(
                               children: <Widget>[
                                 ButtonBar(
-                                  buttonPadding: EdgeInsets.all(0),
                                   children: <Widget>[
                                     IconButton(
                                       icon: Icon(Icons.check),

@@ -1,8 +1,4 @@
 import 'package:chatto/models/auth-model.dart';
-import 'package:chatto/models/message-model.dart';
-import 'package:chatto/screens/chat-sreen.dart';
-import 'package:chatto/screens/profile-screen.dart';
-import 'package:chatto/services/messages-service.dart';
 import 'package:chatto/services/users-service.dart';
 import 'package:flutter/material.dart';
 

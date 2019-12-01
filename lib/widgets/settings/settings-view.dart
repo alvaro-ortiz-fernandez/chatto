@@ -70,7 +70,6 @@ class _SettingsViewState extends State<SettingsView> {
                           itemBuilder: (BuildContext context, int index) {
                             final UserSetting setting = settingGroup.settings[index];
                             return SwitchListTile(
-                              contentPadding: EdgeInsets.all(0),
                               value: setting.enabled,
                               onChanged: (newValue) =>
                                 setState(() {

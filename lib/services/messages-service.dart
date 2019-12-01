@@ -9,30 +9,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 class MessagesService {
 
   static final _firestore = Firestore.instance;
-  static Stream<List<QuerySnapshot>> _userMessagesStream;
+  static Stream<Iterable<QuerySnapshot>> _userMessagesStream;
 
   /// ------------------------------------------------------------
   /// Método que obtiene los mensajes de un usuario en firebase
   /// ------------------------------------------------------------
-  static Future<Stream<List<MessageView>>> getUserMessages() async {
+  static Future<Stream<Iterable<MessageView>>> getUserMessages() async {
     // En el primer acceso, cargamos la llamada a firebase para obtener
     // los mensajes. Guardamos en la variable de memoria la referencia,
     // y en el resto de accesos la devolvemos.
     if (_userMessagesStream == null)
       _userMessagesStream = await _loadUserMessagesStream();
 
-    return _userMessagesStream.asyncMap((List<QuerySnapshot> snapshots) async {
+    return _userMessagesStream.asyncMap((Iterable<QuerySnapshot> snapshots) async {
       List<MessageView> messages = List<MessageView>();
 
       // Mapeamos los mensajes para convertir el id del emisor y receptor al objeto usuario
       Map<String, UserData> foundUsers = Map();
 
-      print('getUserMessages(1)');
       for (final QuerySnapshot snapshot in snapshots) {
-        print('getUserMessages(2) snapshots.length: ' + snapshots.length.toString());
         if (snapshot != null && snapshot.documents != null && snapshot.documents.isNotEmpty) {
           for (final DocumentSnapshot doc in snapshot.documents) {
-            print('getUserMessages(3) snapshot.documents.length: ' + snapshot.documents.length.toString());
             Message message = Message.fromDocument(doc);
 
             UserData sender = await _getUserData(foundUsers, message.sender);
@@ -44,7 +41,7 @@ class MessagesService {
         }
       }
 
-      print('getUserMessages(8) messages.length: ' + messages.length.toString());
+      // Ordenamos los mensajes por fecha
       return messages;
     });
   }
@@ -52,20 +49,14 @@ class MessagesService {
   /// ------------------------------------------------------------
   /// Método que obtiene el primer mensaje con cada contacto de un usuario
   /// ------------------------------------------------------------
-  static Future<Stream<List<MessageView>>> getChats() async {
+  static Future<Stream<Iterable<MessageView>>> getChats() async {
 
-    Stream<List<MessageView>> stream = await getUserMessages();
     UserData currentUser = await UsersService.getUserLocal();
 
-    return stream.map((List<MessageView> messages) {
-      print('getChats(1) messages.length: ' + messages.length.toString());
+    return (await getUserMessages()).map((Iterable<MessageView> messages) {
       Map<String, MessageView> lastMessages = Map();
 
-      // Ordenamos los mensajes por fecha
-      messages.sort((a, b) => a.time.compareTo(b.time));
-
       for (final MessageView message in messages) {
-
         // Guardamos sólo un mensaje por cada usuario
         if (message.sender == currentUser.id)
           lastMessages[message.receiver] = message;
@@ -73,7 +64,6 @@ class MessagesService {
           lastMessages[message.sender] = message;
       }
 
-      print('getChats(2) lastMessages.values.length: ' + lastMessages.values.length.toString());
       return lastMessages.values;
     });
   }
@@ -81,11 +71,9 @@ class MessagesService {
   /// ------------------------------------------------------------
   /// Método que obtiene los mensajes entre dos usuarios
   /// ------------------------------------------------------------
-  static Future<Stream<List<MessageView>>> getConversation(String user1Id, String user2Id) async {
+  static Future<Stream<Iterable<MessageView>>> getConversation(String user1Id, String user2Id) async {
 
-    Stream<List<MessageView>> stream = await getUserMessages();
-
-    return stream.map((List<MessageView> messages) {
+    return (await getUserMessages()).map((Iterable<MessageView> messages) {
       List<MessageView> messages = List<MessageView>();
 
       for (final MessageView message in messages) {
@@ -103,19 +91,21 @@ class MessagesService {
   /// ------------------------------------------------------------
   /// Método que obtiene los mensajes de un usuario en firebase
   /// ------------------------------------------------------------
-  static Future<Stream<List<QuerySnapshot>>> _loadUserMessagesStream() async {
+  static Future<Stream<Iterable<QuerySnapshot>>> _loadUserMessagesStream() async {
     FirebaseUser firebaseUser = await AuthService.getCurrentUser();
 
     // Obtenemos los mensajes enviados por nuestro usuario
     Stream<QuerySnapshot> stream1 = _firestore
       .collection('/userMessages')
       .where('sender', isEqualTo: firebaseUser.uid)
+      .orderBy('time', descending: true)
       .snapshots();
 
     // Ahora los mensajes enviados a nuestro usuario
     Stream<QuerySnapshot> stream2 = _firestore
       .collection('/userMessages')
       .where('receiver', isEqualTo: firebaseUser.uid)
+      .orderBy('time', descending: true)
       .snapshots();
 
     // Y devolvemos la unión de ambas colecciones

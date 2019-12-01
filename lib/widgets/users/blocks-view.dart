@@ -120,7 +120,6 @@ class BlocksViewState extends State<BlocksView> {
                             Column(
                               children: <Widget>[
                                 ButtonBar(
-                                  buttonPadding: EdgeInsets.all(0),
                                   children: <Widget>[
                                     IconButton(
                                       icon: Icon(Icons.report_off),

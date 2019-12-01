@@ -120,7 +120,6 @@ class ContactsViewState extends State<ContactsView> {
                             Column(
                               children: <Widget>[
                                 ButtonBar(
-                                  buttonPadding: EdgeInsets.all(0),
                                   children: <Widget>[
                                     IconButton(
                                       icon: Icon(Icons.send),
