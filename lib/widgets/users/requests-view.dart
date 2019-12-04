@@ -116,37 +116,33 @@ class RequestsViewState extends State<RequestsView> {
                                 )
                               ],
                             ),
-                            Column(
+                            Row(
                               children: <Widget>[
-                                ButtonBar(
-                                  children: <Widget>[
-                                    IconButton(
-                                      icon: Icon(Icons.check),
-                                      iconSize: 28.0,
-                                      color: Theme.of(context).primaryColor,
-                                      tooltip: 'Aceptar',
-                                      onPressed: () {
-                                        mostrarAlertaAceptacion(user.name)
-                                          .then((decision) {
-                                            if (decision == true)
-                                              UsersScreen.of(context).aceptarPeticion(user);
-                                          });
-                                      }
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.close),
-                                      iconSize: 28.0,
-                                      color: Colors.red,
-                                      tooltip: 'Rechazar',
-                                      onPressed: () {
-                                        mostrarAlertaDenegacion(user.name)
-                                          .then((decision) {
-                                            if (decision == true)
-                                              UsersScreen.of(context).rechazarPeticion(user);
-                                          });
-                                      }
-                                    )
-                                  ],
+                                IconButton(
+                                  icon: Icon(Icons.check),
+                                  iconSize: 28.0,
+                                  color: Theme.of(context).primaryColor,
+                                  tooltip: 'Aceptar',
+                                  onPressed: () {
+                                    mostrarAlertaAceptacion(user.name)
+                                      .then((decision) {
+                                        if (decision == true)
+                                          UsersScreen.of(context).aceptarPeticion(user);
+                                      });
+                                  }
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.close),
+                                  iconSize: 28.0,
+                                  color: Colors.red,
+                                  tooltip: 'Rechazar',
+                                  onPressed: () {
+                                    mostrarAlertaDenegacion(user.name)
+                                      .then((decision) {
+                                        if (decision == true)
+                                          UsersScreen.of(context).rechazarPeticion(user);
+                                      });
+                                  }
                                 )
                               ]
                             )

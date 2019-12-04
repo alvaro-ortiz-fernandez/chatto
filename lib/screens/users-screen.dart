@@ -239,6 +239,7 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
                 )
               ),
               onPressed: () {
+                _formKey.currentState.save();
                 if (_formKey.currentState.validate()) {
                   startLoading();
                   Navigator.of(context).pop();
@@ -261,13 +262,15 @@ class UsersScreenState extends State<UsersScreen> with TickerProviderStateMixin,
           content: 'El usuario introducido no existe'
         );
       } else {
-        await UsersService.sendRequest(_currentUser.id, _name);
+        await UsersService.sendRequest(_currentUser.id, optFoundUser.value.id);
         SnackbarService.showInfoSnackbar(
           key: _scaffoldKey,
           content: 'Petición de amistad enviada correctamente.'
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error al agregar contacto: ' + e.toString());
+      print(stackTrace.toString());
       SnackbarService.showErrorSnackbar(
         key: _scaffoldKey,
         content: 'Se ha producido un error, por favor, inténtelo de nuevo.'

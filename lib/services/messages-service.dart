@@ -9,19 +9,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 class MessagesService {
 
   static final _firestore = Firestore.instance;
-  static Stream<Iterable<QuerySnapshot>> _userMessagesStream;
 
   /// ------------------------------------------------------------
   /// Método que obtiene los mensajes de un usuario en firebase
   /// ------------------------------------------------------------
   static Future<Stream<Iterable<MessageView>>> getUserMessages() async {
-    // En el primer acceso, cargamos la llamada a firebase para obtener
-    // los mensajes. Guardamos en la variable de memoria la referencia,
-    // y en el resto de accesos la devolvemos.
-    if (_userMessagesStream == null)
-      _userMessagesStream = await _loadUserMessagesStream();
+    Stream<Iterable<QuerySnapshot>> messagesStream = await _loadUserMessagesStream();
 
-    return _userMessagesStream.asyncMap((Iterable<QuerySnapshot> snapshots) async {
+    return messagesStream.asyncMap((Iterable<QuerySnapshot> snapshots) async {
       List<MessageView> messages = List<MessageView>();
 
       // Mapeamos los mensajes para convertir el id del emisor y receptor al objeto usuario
@@ -73,10 +68,10 @@ class MessagesService {
   /// ------------------------------------------------------------
   static Future<Stream<Iterable<MessageView>>> getConversation(String user1Id, String user2Id) async {
 
-    return (await getUserMessages()).map((Iterable<MessageView> messages) {
+    return (await getUserMessages()).map((Iterable<MessageView> foundMessages) {
       List<MessageView> messages = List<MessageView>();
 
-      for (final MessageView message in messages) {
+      for (final MessageView message in foundMessages) {
         // Sólo añadimos los mensajes que sean entre los dos usuarios pasados por parámetro
         if ((message.sender == user1Id && message.receiver == user2Id)
             || (message.receiver == user1Id && message.sender == user2Id)) {
@@ -86,6 +81,22 @@ class MessagesService {
 
       return messages;
     });
+  }
+
+  /// ------------------------------------------------------------
+  /// Método que añade un nuevo mensaje a una conversación
+  /// ------------------------------------------------------------
+  static Future<void> newMessage(String sender, String receiver, String content) async {
+    // Añadimos el mensaje en firebase
+    await _firestore
+      .collection('/userMessages')
+      .add({
+        'sender': sender,
+        'receiver': receiver,
+        'content': content,
+        'time': DateTime.now(),
+        'unread': true
+      });
   }
 
   /// ------------------------------------------------------------

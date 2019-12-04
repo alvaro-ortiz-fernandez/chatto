@@ -76,7 +76,7 @@ class ContactsViewState extends State<ContactsView> {
                       ),
                       child: Container(
                         margin: EdgeInsets.only(top: 5.0),
-                        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                        padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -117,51 +117,47 @@ class ContactsViewState extends State<ContactsView> {
                                 )
                               ],
                             ),
-                            Column(
+                            Row(
                               children: <Widget>[
-                                ButtonBar(
-                                  children: <Widget>[
-                                    IconButton(
-                                      icon: Icon(Icons.send),
-                                      iconSize: 28.0,
-                                      color: Theme.of(context).primaryColor,
-                                      tooltip: 'Enviar mensaje',
-                                      onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => ChatScreen(
-                                            talkingUser: user
-                                          )
-                                        )
+                                IconButton(
+                                  icon: Icon(Icons.send),
+                                  iconSize: 28.0,
+                                  color: Theme.of(context).primaryColor,
+                                  tooltip: 'Enviar mensaje',
+                                  onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ChatScreen(
+                                        talkingUser: user
                                       )
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.block),
-                                      iconSize: 28.0,
-                                      color: Colors.black54,
-                                      tooltip: 'Bloquear',
-                                      onPressed: () {
-                                        mostrarAlertaBloqueo(user.name)
-                                          .then((decision) {
-                                            if (decision == true)
-                                              UsersScreen.of(context).bloquearContacto(user);
-                                        });
-                                      }
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete),
-                                      iconSize: 28.0,
-                                      color: Colors.red,
-                                      tooltip: 'Eliminar',
-                                      onPressed: () {
-                                        mostrarAlertaEliminacion(user.name)
-                                          .then((decision) {
-                                            if (decision == true)
-                                              UsersScreen.of(context).eliminarContacto(user);
-                                          });
-                                      }
                                     )
-                                  ],
+                                  )
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.block),
+                                  iconSize: 28.0,
+                                  color: Colors.black54,
+                                  tooltip: 'Bloquear',
+                                  onPressed: () {
+                                    mostrarAlertaBloqueo(user.name)
+                                      .then((decision) {
+                                        if (decision == true)
+                                          UsersScreen.of(context).bloquearContacto(user);
+                                    });
+                                  }
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete),
+                                  iconSize: 28.0,
+                                  color: Colors.red,
+                                  tooltip: 'Eliminar',
+                                  onPressed: () {
+                                    mostrarAlertaEliminacion(user.name)
+                                      .then((decision) {
+                                        if (decision == true)
+                                          UsersScreen.of(context).eliminarContacto(user);
+                                      });
+                                  }
                                 )
                               ]
                             )

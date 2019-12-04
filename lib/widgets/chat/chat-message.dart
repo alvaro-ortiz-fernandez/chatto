@@ -1,4 +1,5 @@
 import 'package:chatto/models/message-model.dart';
+import 'package:chatto/widgets/ui/time-utils.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessage extends StatelessWidget {
@@ -25,7 +26,7 @@ class ChatMessage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            message.time.toString(),
+            TimeUtils.formatDate(message.time),
             style: TextStyle(
               color: isMe
                 ? Colors.white

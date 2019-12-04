@@ -49,7 +49,7 @@ class _SignupScreenState extends State<SignupScreen> with Loadable {
     return Column(
       children: <Widget>[
         Container(
-          height: 180.0,
+          height: 80.0,
           decoration: new BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.centerLeft,

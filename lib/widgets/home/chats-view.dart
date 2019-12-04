@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chatto/models/auth-model.dart';
 import 'package:chatto/models/message-model.dart';
 import 'package:chatto/services/messages-service.dart';
@@ -15,14 +17,13 @@ class ChatsView extends StatefulWidget {
 
 class _ChatsViewState extends State<ChatsView> {
   static Iterable<MessageView> lastFoundMessages = Iterable.empty();
+  List<StreamSubscription> streamSubscriptions = List<StreamSubscription>();
   Iterable<MessageView> messages = Iterable.empty();
   UserData _currentUser;
 
   Future<void> loadData() async {
     setState(() {
-      print('messages.length (1): ' + messages.length.toString());
       messages = lastFoundMessages;
-      print('messages.length (2): ' + messages.length.toString());
     });
 
     UserData user = await UsersService.getUserLocal();
@@ -30,15 +31,14 @@ class _ChatsViewState extends State<ChatsView> {
 
     _getMessagesStream()
       .then((Stream<Iterable<MessageView>> messagesStream) {
-        print('messagesStream');
-
-        messagesStream.listen((Iterable<MessageView> foundMessages) {
-          print('########### foundMessages 2: ' + foundMessages.length.toString());
-          setState(() {
-            messages = foundMessages;
-            lastFoundMessages = foundMessages;
-          });
-        });
+        streamSubscriptions.add(messagesStream.listen((Iterable<MessageView> foundMessages) {
+          if (mounted) {
+            setState(() {
+              messages = foundMessages;
+              lastFoundMessages = foundMessages;
+            });
+          }
+        }));
       });
   }
 
@@ -50,6 +50,15 @@ class _ChatsViewState extends State<ChatsView> {
   void initState() {
     super.initState();
     loadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    for (final StreamSubscription streamSubscription in streamSubscriptions) {
+      streamSubscription.cancel();
+    }
   }
 
   @override
@@ -165,7 +174,7 @@ class _ChatsViewState extends State<ChatsView> {
                                 ),
                                 SizedBox(height: 5.0),
                                 message.unread
-                                  ? Container(
+                                  ? Text('')/*Container(
                                       width: 35.0,
                                       height: 35.0,
                                       padding: EdgeInsets.only(top: 3),
@@ -183,7 +192,7 @@ class _ChatsViewState extends State<ChatsView> {
                                           fontFamily: 'GilroyBold'
                                         )
                                       )
-                                    )
+                                    )*/
                                   : Text('')
                               ],
                             )
